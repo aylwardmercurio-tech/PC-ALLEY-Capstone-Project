@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Bebas+Neue&display=swap');
+
+:root {
+  --accent:        215, 38, 56;
+  --accent2:       255, 59, 78;
+  --neon-blue:     0, 242, 255;
+  --neon-purple:   188, 19, 254;
+  --navy-rgb:      11, 25, 41;
+  --bg-base-rgb:   10, 10, 10;
+  --text-main-rgb: 255, 255, 255;
+  --text-muted:    122, 143, 168;
+  --border-rgba:   255, 255, 255, 0.08;
+
+  /* Brand Variables Mapping (Pure RGB) */
+  --brand-navy-rgb:    11, 25, 41;
+  --brand-surface-rgb: 14, 20, 27;
+  --brand-panel-rgb:   8, 11, 18;
+  --brand-bgbase-rgb:  10, 10, 10;
+  --text-main-rgb:     255, 255, 255;
+  --text-title-rgb:    255, 255, 255;
+  --text-muted-rgb:    122, 143, 168;
+  --brand-border-rgb:  255, 255, 255;
+  --brand-neonblue-rgb: 0, 242, 255;
+  --brand-neonpurple-rgb: 188, 19, 254;
+  --brand-hover-rgb:   255, 255, 255;
+
+  /* Shorthands for CSS usage */
+  --brand-bgbase:  rgb(var(--brand-bgbase-rgb));
+  --text-main:     rgb(var(--text-main-rgb));
+  --text-title:    rgb(var(--text-title-rgb));
+  --text-muted:    rgb(var(--text-muted-rgb));
+  --brand-crimson: rgb(var(--accent));
+  
+  --glass-bg: rgba(13, 19, 27, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+.light {
+  --brand-navy-rgb:    255, 255, 255;
+  --brand-surface-rgb: 248, 250, 252;
+  --brand-panel-rgb:   255, 255, 255;
+  --brand-bgbase-rgb:  241, 245, 249;
+  --text-main-rgb:     15, 23, 42;
+  --text-title-rgb:    15, 23, 42;
+  --text-muted-rgb:    71, 85, 105; /* Darker Slate-600 for contrast */
+  --brand-border-rgb:  226, 232, 240;
+  --brand-neonblue-rgb: 59, 130, 246; /* Blue-500 */
+  --brand-neonpurple-rgb: 139, 92, 246; /* Purple-500 */
+  --brand-hover-rgb:   248, 250, 252;
+
+  --brand-bgbase:  rgb(var(--brand-bgbase-rgb));
+  --text-main:     rgb(var(--text-main-rgb));
+  --text-title:    rgb(var(--text-title-rgb));
+  --text-muted:    rgb(var(--text-muted-rgb));
+  --brand-crimson: rgb(var(--accent));
+}
+
+body {
+  background: var(--brand-bgbase);
+  color: var(--text-main);
+  @apply font-dmsans overflow-x-hidden transition-colors duration-300;
+}
+
+::selection {
+  background: rgba(215, 38, 56, 0.3);
+}
+
+h1, h2, h3, h4, .font-rajdhani {
+  font-family: var(--font-rajdhani);
+  @apply tracking-tight font-bold uppercase;
+}
+
+.font-bebas {
+  font-family: var(--font-bebas);
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  @apply shadow-2xl transition-all duration-300;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  @apply rounded-xl transition-all duration-300;
+}
+
+.glass-card:hover {
+  border-color: color-mix(in srgb, var(--brand-crimson), transparent 80%);
+  background: color-mix(in srgb, var(--glass-bg), var(--brand-crimson) 5%);
+}
+
+/* Animated Grid Background */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(215, 38, 56, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(215, 38, 56, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+}
+
+/* ── Custom Utilities from Design ── */
+.logo-hex {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(215, 38, 56, 0.3);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(215, 38, 56, 0.2);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 10px; }
+
+/* ── Neon Utilities ── */
+.text-neon-blue { color: var(--neon-blue); }
+.text-neon-purple { color: var(--neon-purple); }
+.text-neon-crimson { color: var(--accent); }
+
+.border-neon-blue { border-color: var(--neon-blue); }
+.border-neon-purple { border-color: var(--neon-purple); }
+.border-neon-crimson { border-color: var(--accent); }
+
+.glow-blue { box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
+.glow-purple { box-shadow: 0 0 20px rgba(188, 19, 254, 0.2); }
