@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "../../components/Sidebar";
 import TopBar from "../../components/TopBar";
 import { 
@@ -21,6 +22,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { apiUrl } from "../../lib/api";
 
 export default function AdminPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -67,9 +70,37 @@ export default function AdminPage() {
     setProvisionData((prev) => ({
       ...prev,
       role: availableRoles[0]?.value || "employee",
-      branch_id: currentUser.role === "branch_admin" ? String(currentUser.branch_id) : prev.branch_id
+      branch_id: currentUser.role === "branch_admin"
+        ? String(currentUser.branch_id)
+        : (prev.branch_id || (branches[0] ? String(branches[0].id) : ""))
     }));
-  }, [currentUser]);
+  }, [currentUser, branches]);
+
+  const resetProvisionForm = () => {
+    setProvisionData({
+      username: "",
+      password: "",
+      role: availableRoles[0]?.value || "employee",
+      branch_id: currentUser?.role === "branch_admin"
+        ? String(currentUser.branch_id)
+        : (branches[0] ? String(branches[0].id) : "")
+    });
+  };
+
+  const openProvisionModal = () => {
+    resetProvisionForm();
+    setIsModalOpen(true);
+  };
+
+  useEffect(() => {
+    if (searchParams.get("create") !== "1") return;
+    if (!currentUser) return;
+    if (currentUser.role === "employee") return;
+    if (currentUser.role === "super_admin" && !branches.length) return;
+
+    openProvisionModal();
+    router.replace("/admin");
+  }, [searchParams, currentUser, branches]);
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
@@ -101,13 +132,29 @@ export default function AdminPage() {
   const handleProvision = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+
+    if (!branches.length) {
+      alert("No branches available yet. Create a branch first before registering personnel.");
+      return;
+    }
     
     const payload = {
       ...provisionData,
+      username: provisionData.username.trim().toLowerCase(),
       branch_id: currentUser.role === 'branch_admin'
         ? Number(currentUser.branch_id)
         : Number(provisionData.branch_id)
     };
+
+    if (!payload.username) {
+      alert("Please enter a username for the new account.");
+      return;
+    }
+
+    if (!payload.password || payload.password.length < 6) {
+      alert("Password must be at least 6 characters.");
+      return;
+    }
 
     if (!payload.branch_id || Number.isNaN(payload.branch_id)) {
       alert("Please assign a branch for the new account.");
@@ -126,12 +173,7 @@ export default function AdminPage() {
       
       if (res.ok) {
         setIsModalOpen(false);
-        setProvisionData({
-          username: "",
-          password: "",
-          role: availableRoles[0]?.value || "employee",
-          branch_id: currentUser.role === "branch_admin" ? String(currentUser.branch_id) : ""
-        });
+        resetProvisionForm();
         fetchData();
       } else {
         const errData = await res.json();
@@ -234,7 +276,7 @@ export default function AdminPage() {
                     </button>
                   )}
                   <button 
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={openProvisionModal}
                     className="h-10 px-4 md:px-5 bg-brand-surface border border-border rounded-xl flex items-center gap-3 text-[9px] md:text-[10px] font-black uppercase tracking-[2px] text-muted hover:bg-brand-crimson hover:text-main transition-all group flex-1 md:flex-none justify-center"
                   >
                      Create Account
@@ -504,7 +546,7 @@ export default function AdminPage() {
                        required
                      >
                         {currentUser?.role !== 'branch_admin' && (
-                          <option value="" className="bg-brand-surface">Select Branch</option>
+                          <option value="" disabled className="bg-brand-surface">Select Branch</option>
                         )}
                         {branches.map(b => (
                            <option key={b.id} value={b.id} className="bg-brand-surface">{b.name}</option>
@@ -516,7 +558,10 @@ export default function AdminPage() {
                 <div className="pt-6 flex gap-4">
                   <button 
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      resetProvisionForm();
+                    }}
                     className="flex-1 py-4 rounded-2xl border border-border text-[10px] font-black uppercase tracking-[3px] text-muted hover:text-main hover:bg-brand-muted/5 transition-all"
                   >
                    Abort

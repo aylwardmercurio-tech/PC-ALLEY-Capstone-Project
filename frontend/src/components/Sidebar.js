@@ -7,6 +7,7 @@ import {
   Package,
   ShoppingCart,
   Users,
+  UserPlus,
   LogOut,
   LayoutDashboard,
   Settings,
@@ -25,12 +26,15 @@ const Sidebar = () => {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { isCollapsed, setIsCollapsed, isMobile, isSidebarOpen, setIsSidebarOpen } = useLayout();
+  const [user, setUser] = useState(null);
+  const personnelTitle = user?.role === "super_admin" ? "Personnel Registry" : "Staff Registry";
 
   const navItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
     { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
     { title: "Products", icon: ShoppingCart, path: "/products", group: "SALES" },
     { title: "Customers", icon: Users, path: "/customers", group: "SALES" },
+    { title: personnelTitle, icon: UserPlus, path: "/staff", group: "SALES" },
     { title: "Analytics", icon: BarChart3, path: "/analytics", group: "SYSTEM" },
     { title: "Admin Panel", icon: ShieldCheck, path: "/admin", group: "SYSTEM" },
   ];
@@ -41,8 +45,6 @@ const Sidebar = () => {
     localStorage.clear();
     window.location.href = "/";
   };
-
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -85,7 +87,7 @@ const Sidebar = () => {
 
   const isAllowed = (itemPath) => {
     if (user?.role === 'employee') {
-      return !['/analytics', '/admin'].includes(itemPath);
+      return !['/analytics', '/admin', '/staff'].includes(itemPath);
     }
     return true;
   };

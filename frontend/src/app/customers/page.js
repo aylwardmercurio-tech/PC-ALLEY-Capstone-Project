@@ -6,7 +6,6 @@ import TopBar from "../../components/TopBar";
 import StatCard from "../../components/StatCard";
 import {
   Users,
-  UserPlus,
   Search,
   Filter,
   MoreVertical,
@@ -182,9 +181,6 @@ export default function CustomersPage() {
                   className="w-full bg-brand-bgbase border border-border rounded-xl py-2.5 pl-11 pr-4 text-xs text-main focus:outline-none focus:border-brand-neonblue/30 transition-all font-bold"
                 />
               </div>
-              <button className="h-11 w-full md:w-auto px-6 bg-brand-crimson hover:bg-red-700 rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-main transition-all shadow-lg shadow-brand-crimson/20">
-                <UserPlus size={18} /> Register Personnel
-              </button>
             </div>
 
             <div className="overflow-x-auto">

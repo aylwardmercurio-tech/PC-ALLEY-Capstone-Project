@@ -2,6 +2,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { User, Branch } = require('../models');
 
+const normalizeBranchId = (value) => {
+  if (value === '' || value === null || typeof value === 'undefined') {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : NaN;
+};
+
 const register = async (req, res) => {
   try {
     const { password, role, branch_id } = req.body;
@@ -25,11 +34,15 @@ const register = async (req, res) => {
       });
     }
 
-    const normalizedBranchId = req.user.role === 'branch_admin'
-      ? Number(req.user.branch_id)
-      : (branch_id === '' || branch_id === null || typeof branch_id === 'undefined' ? null : Number(branch_id));
+    if (!password || String(password).length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
 
-    if (!normalizedBranchId) {
+    const normalizedBranchId = req.user.role === 'branch_admin'
+      ? normalizeBranchId(req.user.branch_id)
+      : normalizeBranchId(branch_id);
+
+    if (normalizedBranchId === null) {
       return res.status(400).json({ message: 'A branch assignment is required for Manager and Staff accounts' });
     }
 
@@ -60,6 +73,10 @@ const register = async (req, res) => {
     });
     res.status(201).json({ message: 'User provisioned successfully', userId: user.id });
   } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ message: 'Username already exists' });
+    }
+
     res.status(500).json({ error: error.message });
   }
 };
