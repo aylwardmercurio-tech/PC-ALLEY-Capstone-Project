@@ -107,11 +107,34 @@ import { useNotifications } from "../context/NotificationContext";
               setIsNotificationsOpen(true);
               markAllAsRead();
             }}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-brand-surface border border-border hover:border-brand-crimson/30 flex items-center justify-center relative transition-all duration-300 group"
+            className={`relative h-10 md:h-11 rounded-2xl border transition-all duration-300 group overflow-hidden shadow-sm ${
+              unreadCount > 0
+                ? "bg-gradient-to-br from-brand-crimson/15 via-brand-surface to-brand-neonpurple/10 border-brand-crimson/30 shadow-[0_12px_30px_rgba(215,38,56,0.18)]"
+                : "bg-brand-surface border-border hover:border-brand-crimson/20"
+            } ${isMobile ? "w-10" : "px-3.5 md:px-4"}`}
+            title={unreadCount > 0 ? `${unreadCount} unread notifications` : "Notifications"}
           >
-            <Bell size={18} className="text-muted group-hover:text-main" />
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[radial-gradient(circle_at_top,rgba(215,38,56,0.16),transparent_60%)]" />
+            <div className={`relative flex items-center justify-center ${isMobile ? "w-full" : "gap-2.5"}`}>
+              <div className="relative flex items-center justify-center">
+                {unreadCount > 0 && (
+                  <span className="absolute inset-[-6px] rounded-full border border-brand-crimson/30 animate-pulse" />
+                )}
+                <Bell size={18} className={`${unreadCount > 0 ? "text-brand-crimson" : "text-muted"} group-hover:text-main transition-colors`} />
+              </div>
+              {!isMobile && (
+                <div className="hidden md:flex flex-col items-start leading-none">
+                  <span className="text-[9px] font-black uppercase tracking-[2px] text-muted/70 group-hover:text-muted transition-colors">
+                    Alerts
+                  </span>
+                  <span className={`text-[11px] font-black uppercase tracking-[2px] ${unreadCount > 0 ? "text-main" : "text-muted"}`}>
+                    {unreadCount > 0 ? `${unreadCount} New` : "All Clear"}
+                  </span>
+                </div>
+              )}
+            </div>
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-crimson text-[9px] font-black text-white flex items-center justify-center border-2 border-brand-bgbase shadow-[0_0_8px_rgba(215,38,56,0.5)]">
+              <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-crimson text-[9px] font-black text-white flex items-center justify-center border-2 border-brand-bgbase shadow-[0_0_12px_rgba(215,38,56,0.45)]">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
