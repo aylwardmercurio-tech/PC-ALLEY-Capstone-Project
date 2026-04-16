@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -42,6 +43,19 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
   } = useNotifications();
   const unreadCount = notifications.filter((note) => !note.read).length;
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -61,71 +75,61 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-[440px] bg-[linear-gradient(180deg,rgba(11,25,41,0.98),rgba(8,11,18,0.98))] backdrop-blur-2xl border-l border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.45)] z-[101] flex flex-col font-dm-sans"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-[380px] bg-brand-navy/95 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)] z-[101] flex flex-col font-dm-sans"
           >
             {/* Header */}
-            <div className="relative overflow-hidden border-b border-white/10">
-              <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(215,38,56,0.22),transparent_65%)] pointer-events-none" />
-              <div className="absolute right-0 top-0 h-32 w-32 bg-[radial-gradient(circle,rgba(188,19,254,0.16),transparent_70%)] pointer-events-none" />
-
-              <div className="relative p-6 pb-5">
-                <div className="flex items-start justify-between gap-3">
+            <div className="sticky top-0 z-10 border-b border-white/10 bg-brand-navy/95 backdrop-blur-2xl">
+              <div className="p-5">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-brand-crimson/10 border border-brand-crimson/20 flex items-center justify-center text-brand-crimson shadow-[0_0_24px_rgba(215,38,56,0.18)]">
+                    <div className="w-10 h-10 rounded-xl bg-brand-crimson/10 border border-brand-crimson/20 flex items-center justify-center text-brand-crimson">
                       <Bell size={18} />
                     </div>
                     <div>
                       <h2 className="text-sm font-bold uppercase tracking-[3px] text-main">Alert Hub</h2>
                       <p className="text-[10px] text-brand-muted font-bold uppercase tracking-[2px] mt-1">
-                        {notifications.length ? `${notifications.length} active transmissions` : "No active transmissions"}
+                        {notifications.length ? `${notifications.length} alerts` : "No active alerts"}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={onClose}
-                    className="p-2.5 hover:bg-white/5 rounded-xl transition-colors text-brand-muted hover:text-main"
+                    className="h-10 w-10 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] transition-colors text-brand-muted hover:text-main flex items-center justify-center"
+                    aria-label="Close notifications"
                   >
                     <X size={18} />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mt-5">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <p className="text-[9px] font-black uppercase tracking-[3px] text-brand-muted mb-2">Unread</p>
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                    <p className="text-[9px] font-black uppercase tracking-[3px] text-brand-muted mb-1">Unread</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-rajdhani font-black text-main">{unreadCount}</span>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-brand-crimson/20 bg-brand-crimson/10 px-2 py-1 text-[9px] font-black uppercase tracking-[2px] text-brand-crimson">
-                        <Sparkles size={10} />
-                        Live
-                      </span>
+                      <span className="text-xl font-rajdhani font-black text-main">{unreadCount}</span>
+                      {unreadCount > 0 && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-brand-crimson/20 bg-brand-crimson/10 px-2 py-1 text-[9px] font-black uppercase tracking-[2px] text-brand-crimson">
+                          <Sparkles size={10} />
+                          New
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <p className="text-[9px] font-black uppercase tracking-[3px] text-brand-muted mb-2">Status</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-rajdhani font-black text-main">
-                        {notifications.length ? "Online" : "Clear"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {!!notifications.length && (
-                  <div className="flex items-center gap-3 mt-5">
-                    <button
-                      onClick={markAllAsRead}
-                      className="flex-1 h-11 rounded-2xl border border-white/10 bg-white/[0.04] text-[10px] font-black uppercase tracking-[3px] text-main hover:bg-white/[0.07] transition-all flex items-center justify-center gap-2"
-                    >
+                  <button
+                    onClick={markAllAsRead}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-left hover:bg-white/[0.06] transition-all"
+                  >
+                    <p className="text-[9px] font-black uppercase tracking-[3px] text-brand-muted mb-1">Quick Action</p>
+                    <div className="flex items-center gap-2 text-main text-[10px] font-black uppercase tracking-[2px]">
                       <CheckCheck size={14} />
                       Mark All Read
-                    </button>
-                  </div>
-                )}
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
               {notifications.length ? (
                 <div className="space-y-3">
                   {notifications.map((note, i) => {
@@ -137,7 +141,7 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.08 }}
-                        className={`rounded-[24px] border p-4 group transition-all ${
+                        className={`rounded-2xl border p-4 group transition-all ${
                           note.read
                             ? "border-white/8 bg-white/[0.025] opacity-60"
                             : `border-white/10 ${config.bgOrigin} bg-white/[0.035] hover:bg-white/[0.05]`
@@ -168,13 +172,13 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
                             <div className="mt-4 flex items-center gap-2">
                               <button
                                 onClick={() => markAsRead(note.id)}
-                                className="h-9 px-3 rounded-xl border border-brand-crimson/20 bg-brand-crimson/10 text-[9px] font-black uppercase tracking-[2px] text-brand-crimson hover:bg-brand-crimson/15 transition-all"
+                                className="h-9 px-3 rounded-lg border border-brand-crimson/20 bg-brand-crimson/10 text-[9px] font-black uppercase tracking-[2px] text-brand-crimson hover:bg-brand-crimson/15 transition-all"
                               >
                                 Acknowledge
                               </button>
                               <button
                                 onClick={() => removeNotification(note.id)}
-                                className="h-9 px-3 rounded-xl border border-white/10 bg-white/[0.03] text-[9px] font-black uppercase tracking-[2px] text-brand-muted hover:text-main hover:bg-white/[0.05] transition-all"
+                                className="h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-[9px] font-black uppercase tracking-[2px] text-brand-muted hover:text-main hover:bg-white/[0.05] transition-all"
                               >
                                 Dismiss
                               </button>
@@ -187,8 +191,8 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
                 </div>
               ) : (
                 <div className="h-full flex items-center justify-center py-12">
-                  <div className="w-full rounded-[28px] border border-white/10 bg-white/[0.03] p-8 text-center">
-                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[22px] border border-white/10 bg-white/[0.04] text-brand-neonblue">
+                  <div className="w-full rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center">
+                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-brand-neonblue">
                       <Clock size={28} className="stroke-[1.5px]" />
                     </div>
                     <p className="text-[11px] font-black uppercase tracking-[4px] text-main">No Alerts In Stream</p>
@@ -201,10 +205,10 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            <div className="p-5 border-t border-white/10 bg-white/[0.02]">
+            <div className="p-4 border-t border-white/10 bg-white/[0.02]">
               <button
                 onClick={clearAll}
-                className="w-full h-12 rounded-2xl border border-white/10 bg-white/[0.04] text-[10px] font-bold uppercase tracking-[3px] hover:bg-white/[0.07] transition-all flex items-center justify-center gap-2"
+                className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.04] text-[10px] font-bold uppercase tracking-[3px] hover:bg-white/[0.07] transition-all flex items-center justify-center gap-2"
               >
                 <Trash2 size={14} />
                 Purge All Alerts
