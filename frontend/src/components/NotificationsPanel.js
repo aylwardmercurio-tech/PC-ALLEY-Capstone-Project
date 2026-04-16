@@ -9,6 +9,8 @@ import {
   Clock,
   Trash2,
   Bell,
+  CheckCheck,
+  Sparkles,
 } from "lucide-react";
 import { useNotifications } from "../context/NotificationContext";
 
@@ -38,6 +40,7 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
     removeNotification,
     clearAll,
   } = useNotifications();
+  const unreadCount = notifications.filter((note) => !note.read).length;
 
   return (
     <AnimatePresence>
@@ -58,102 +61,150 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-brand-deep/95 backdrop-blur-xl border-l border-border shadow-2xl z-[101] flex flex-col font-dm-sans"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-[440px] bg-[linear-gradient(180deg,rgba(11,25,41,0.98),rgba(8,11,18,0.98))] backdrop-blur-2xl border-l border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.45)] z-[101] flex flex-col font-dm-sans"
           >
             {/* Header */}
-            <div className="p-6 border-b border-border flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-brand-crimson/10 border border-brand-crimson/20 flex items-center justify-center text-brand-crimson">
-                  <Bell size={16} />
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold uppercase tracking-widest text-main">Alert Hub</h2>
-                  <p className="text-[10px] text-brand-muted font-bold uppercase tracking-tight">
-                    {notifications.length ? `${notifications.length} Active Transmissions` : "No Active Transmissions"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {!!notifications.length && (
+            <div className="relative overflow-hidden border-b border-white/10">
+              <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(215,38,56,0.22),transparent_65%)] pointer-events-none" />
+              <div className="absolute right-0 top-0 h-32 w-32 bg-[radial-gradient(circle,rgba(188,19,254,0.16),transparent_70%)] pointer-events-none" />
+
+              <div className="relative p-6 pb-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-brand-crimson/10 border border-brand-crimson/20 flex items-center justify-center text-brand-crimson shadow-[0_0_24px_rgba(215,38,56,0.18)]">
+                      <Bell size={18} />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold uppercase tracking-[3px] text-main">Alert Hub</h2>
+                      <p className="text-[10px] text-brand-muted font-bold uppercase tracking-[2px] mt-1">
+                        {notifications.length ? `${notifications.length} active transmissions` : "No active transmissions"}
+                      </p>
+                    </div>
+                  </div>
                   <button
-                    onClick={markAllAsRead}
-                    className="text-[9px] font-bold uppercase tracking-widest text-brand-neonblue hover:text-main transition-colors"
+                    onClick={onClose}
+                    className="p-2.5 hover:bg-white/5 rounded-xl transition-colors text-brand-muted hover:text-main"
                   >
-                    Mark All Read
+                    <X size={18} />
                   </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-5">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-[9px] font-black uppercase tracking-[3px] text-brand-muted mb-2">Unread</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-rajdhani font-black text-main">{unreadCount}</span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-brand-crimson/20 bg-brand-crimson/10 px-2 py-1 text-[9px] font-black uppercase tracking-[2px] text-brand-crimson">
+                        <Sparkles size={10} />
+                        Live
+                      </span>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-[9px] font-black uppercase tracking-[3px] text-brand-muted mb-2">Status</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-rajdhani font-black text-main">
+                        {notifications.length ? "Online" : "Clear"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {!!notifications.length && (
+                  <div className="flex items-center gap-3 mt-5">
+                    <button
+                      onClick={markAllAsRead}
+                      className="flex-1 h-11 rounded-2xl border border-white/10 bg-white/[0.04] text-[10px] font-black uppercase tracking-[3px] text-main hover:bg-white/[0.07] transition-all flex items-center justify-center gap-2"
+                    >
+                      <CheckCheck size={14} />
+                      Mark All Read
+                    </button>
+                  </div>
                 )}
-                <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-main/5 rounded-lg transition-colors text-brand-muted hover:text-main"
-                >
-                  <X size={18} />
-                </button>
               </div>
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
               {notifications.length ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {notifications.map((note, i) => {
                     const config = notificationConfig[note.type] || notificationConfig.info;
                     const Icon = config.icon;
                     return (
-                  <motion.div
-                    key={note.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className={`p-4 rounded-2xl border border-border ${config.bgOrigin} group cursor-pointer hover:border-border transition-all ${
-                      note.read ? "opacity-60" : ""
-                    }`}
-                  >
-                    <div className="flex gap-4">
-                      <div className={`mt-1 p-2 rounded-lg bg-brand-deep border border-border ${config.color}`}>
-                        <Icon size={16} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-1">
-                          <h3 className="text-[13px] font-bold text-main group-hover:text-brand-crimson transition-colors">{note.title}</h3>
-                          <span className="text-[9px] font-bold text-brand-muted uppercase whitespace-nowrap">{note.time}</span>
+                      <motion.div
+                        key={note.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                        className={`rounded-[24px] border p-4 group transition-all ${
+                          note.read
+                            ? "border-white/8 bg-white/[0.025] opacity-60"
+                            : `border-white/10 ${config.bgOrigin} bg-white/[0.035] hover:bg-white/[0.05]`
+                        }`}
+                      >
+                        <div className="flex gap-4">
+                          <div className={`mt-1 h-11 w-11 shrink-0 rounded-2xl bg-[#0C1522] border border-white/10 flex items-center justify-center ${config.color}`}>
+                            <Icon size={17} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-3 mb-1">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h3 className="text-[13px] font-bold text-main">{note.title}</h3>
+                                  {!note.read && (
+                                    <span className="inline-flex h-2 w-2 rounded-full bg-brand-crimson shadow-[0_0_10px_rgba(215,38,56,0.55)]" />
+                                  )}
+                                </div>
+                                <p className="text-[9px] font-black uppercase tracking-[2px] text-brand-muted mt-1">
+                                  {note.type} priority
+                                </p>
+                              </div>
+                              <span className="text-[9px] font-bold text-brand-muted uppercase whitespace-nowrap">{note.time}</span>
+                            </div>
+                            <p className="text-[11px] text-brand-muted leading-relaxed">
+                              {note.message}
+                            </p>
+                            <div className="mt-4 flex items-center gap-2">
+                              <button
+                                onClick={() => markAsRead(note.id)}
+                                className="h-9 px-3 rounded-xl border border-brand-crimson/20 bg-brand-crimson/10 text-[9px] font-black uppercase tracking-[2px] text-brand-crimson hover:bg-brand-crimson/15 transition-all"
+                              >
+                                Acknowledge
+                              </button>
+                              <button
+                                onClick={() => removeNotification(note.id)}
+                                className="h-9 px-3 rounded-xl border border-white/10 bg-white/[0.03] text-[9px] font-black uppercase tracking-[2px] text-brand-muted hover:text-main hover:bg-white/[0.05] transition-all"
+                              >
+                                Dismiss
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-[11px] text-brand-muted leading-relaxed line-clamp-2">
-                          {note.message}
-                        </p>
-                        <div className="mt-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => markAsRead(note.id)}
-                            className="text-[9px] font-bold uppercase tracking-widest text-brand-crimson hover:underline"
-                          >
-                            Acknowledge
-                          </button>
-                          <span className="text-muted">|</span>
-                          <button
-                            onClick={() => removeNotification(note.id)}
-                            className="text-[9px] font-bold uppercase tracking-widest text-brand-muted hover:text-main"
-                          >
-                            Dismiss
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                  );
-                })}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="mt-8 flex flex-col items-center justify-center py-12 opacity-30">
-                  <Clock size={48} className="stroke-[1px] mb-4" />
-                  <p className="text-[10px] font-bold uppercase tracking-widest">No Alerts In Stream</p>
+                <div className="h-full flex items-center justify-center py-12">
+                  <div className="w-full rounded-[28px] border border-white/10 bg-white/[0.03] p-8 text-center">
+                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[22px] border border-white/10 bg-white/[0.04] text-brand-neonblue">
+                      <Clock size={28} className="stroke-[1.5px]" />
+                    </div>
+                    <p className="text-[11px] font-black uppercase tracking-[4px] text-main">No Alerts In Stream</p>
+                    <p className="text-[11px] text-brand-muted mt-3 max-w-[260px] mx-auto leading-relaxed">
+                      New stock warnings, personnel activity, and system notices will appear here in real time.
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-border bg-white/[0.02]">
+            <div className="p-5 border-t border-white/10 bg-white/[0.02]">
               <button
                 onClick={clearAll}
-                className="w-full py-3 rounded-xl border border-border bg-main/5 text-[10px] font-bold uppercase tracking-[3px] hover:bg-main/10 transition-all flex items-center justify-center gap-2"
+                className="w-full h-12 rounded-2xl border border-white/10 bg-white/[0.04] text-[10px] font-bold uppercase tracking-[3px] hover:bg-white/[0.07] transition-all flex items-center justify-center gap-2"
               >
                 <Trash2 size={14} />
                 Purge All Alerts
