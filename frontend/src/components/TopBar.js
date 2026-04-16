@@ -8,10 +8,12 @@ import NotificationsPanel from "./NotificationsPanel";
 import Breadcrumb from "./Breadcrumb";
 import { useTheme } from "../context/ThemeContext";
 import { useLayout } from "../context/LayoutContext";
+import { useNotifications } from "../context/NotificationContext";
 
  const TopBar = ({ title }) => {
    const { theme, toggleTheme } = useTheme();
    const { isMobile, isSidebarOpen, setIsSidebarOpen } = useLayout();
+   const { unreadCount, markAllAsRead } = useNotifications();
    const router = useRouter();
    const [user, setUser] = useState(null);
    const [dateStr, setDateStr] = useState("");
@@ -101,11 +103,18 @@ import { useLayout } from "../context/LayoutContext";
           <div className="h-6 w-px bg-border mx-1 hidden md:block" />
           
           <button 
-            onClick={() => setIsNotificationsOpen(true)}
+            onClick={() => {
+              setIsNotificationsOpen(true);
+              markAllAsRead();
+            }}
             className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-brand-surface border border-border hover:border-brand-crimson/30 flex items-center justify-center relative transition-all duration-300 group"
           >
             <Bell size={18} className="text-muted group-hover:text-main" />
-            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 md:w-2 md:h-2 bg-brand-crimson rounded-full border-2 border-brand-bgbase shadow-[0_0_8px_rgba(215,38,56,0.5)]" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-crimson text-[9px] font-black text-white flex items-center justify-center border-2 border-brand-bgbase shadow-[0_0_8px_rgba(215,38,56,0.5)]">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
           {/* Profile Dropdown */}

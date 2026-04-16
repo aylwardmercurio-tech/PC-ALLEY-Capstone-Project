@@ -11,8 +11,11 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiUrl } from "../../lib/api";
+import { useNotifications } from "../../context/NotificationContext";
+import toast from "react-hot-toast";
 
 export default function StaffPage() {
+  const { addNotification } = useNotifications();
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -148,16 +151,37 @@ export default function StaffPage() {
       if (res.ok) {
         setIsModalOpen(false);
         resetProvisionForm();
+        addNotification({
+          type: "success",
+          title: payload.role === "branch_admin" ? "Manager Registered" : "Staff Registered",
+          message: `${payload.username} was created for ${branches.find((branch) => branch.id === payload.branch_id)?.name || "the selected branch"}.`,
+        });
+        toast.success(`${payload.role === "branch_admin" ? "Manager" : "Staff"} account created`);
         fetchData();
       } else if (data.errors && Array.isArray(data.errors)) {
         const msgs = data.errors.map((entry) => Object.values(entry)[0]).join("\n");
-        alert(`Validation Failed:\n${msgs}`);
+        addNotification({
+          type: "alert",
+          title: "Registration Validation Failed",
+          message: msgs,
+        });
+        toast.error("Validation failed");
       } else {
-        alert(data.message || "Failed to register staff account.");
+        addNotification({
+          type: "alert",
+          title: "Registration Failed",
+          message: data.message || "Failed to register staff account.",
+        });
+        toast.error(data.message || "Failed to register staff account.");
       }
     } catch (err) {
       console.error("Staff registration failed:", err);
-      alert("Network connection error");
+      addNotification({
+        type: "alert",
+        title: "Network Connection Error",
+        message: "Could not reach the backend while registering personnel.",
+      });
+      toast.error("Network connection error");
     }
   };
 

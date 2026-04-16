@@ -1,6 +1,7 @@
 import './globals.css';
 import { Inter, DM_Sans, Rajdhani, Bebas_Neue } from 'next/font/google';
 import { LayoutProvider } from '../context/LayoutContext';
+import { NotificationProvider } from '../context/NotificationContext';
 import { Toaster } from 'react-hot-toast';
 
 const dmSans = DM_Sans({ 
@@ -32,37 +33,39 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${dmSans.variable} ${rajdhani.variable} ${bebasNeue.variable} font-sans antialiased transition-colors duration-300`}>
         <ThemeProvider>
-          <LayoutProvider>
-            {children}
-            <Toaster 
-              position="bottom-right"
-              toastOptions={{
-                style: {
-                  background: 'var(--brand-navy)',
-                  color: 'var(--text-main)',
-                  border: '1px solid var(--border)',
-                  fontFamily: 'var(--font-dm-sans)',
-                  fontSize: '12px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  borderRadius: '16px',
-                },
-                success: {
-                  iconTheme: {
-                    primary: '#22c55e',
-                    secondary: 'var(--brand-bgbase)',
+          <NotificationProvider>
+            <LayoutProvider>
+              {children}
+              <Toaster 
+                position="bottom-right"
+                toastOptions={{
+                  style: {
+                    background: 'var(--brand-navy)',
+                    color: 'var(--text-main)',
+                    border: '1px solid var(--border)',
+                    fontFamily: 'var(--font-dm-sans)',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    borderRadius: '16px',
                   },
-                },
-                error: {
-                  iconTheme: {
-                    primary: 'var(--brand-crimson)',
-                    secondary: 'var(--brand-bgbase)',
+                  success: {
+                    iconTheme: {
+                      primary: '#22c55e',
+                      secondary: 'var(--brand-bgbase)',
+                    },
                   },
-                },
-              }}
-            />
-          </LayoutProvider>
+                  error: {
+                    iconTheme: {
+                      primary: 'var(--brand-crimson)',
+                      secondary: 'var(--brand-bgbase)',
+                    },
+                  },
+                }}
+              />
+            </LayoutProvider>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>
