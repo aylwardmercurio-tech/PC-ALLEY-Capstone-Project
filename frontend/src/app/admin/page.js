@@ -40,6 +40,14 @@ export default function AdminPage() {
   });
   const [editingBranch, setEditingBranch] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const availableRoles = currentUser?.role === "super_admin"
+    ? [
+        { value: "employee", label: "Staff" },
+        { value: "branch_admin", label: "Manager" }
+      ]
+    : [
+        { value: "employee", label: "Staff" }
+      ];
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -52,6 +60,16 @@ export default function AdminPage() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    setProvisionData((prev) => ({
+      ...prev,
+      role: availableRoles[0]?.value || "employee",
+      branch_id: currentUser.role === "branch_admin" ? String(currentUser.branch_id) : prev.branch_id
+    }));
+  }, [currentUser]);
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
@@ -86,8 +104,15 @@ export default function AdminPage() {
     
     const payload = {
       ...provisionData,
-      branch_id: currentUser.role === 'branch_admin' ? currentUser.branch_id : provisionData.branch_id
+      branch_id: currentUser.role === 'branch_admin'
+        ? Number(currentUser.branch_id)
+        : Number(provisionData.branch_id)
     };
+
+    if (!payload.branch_id || Number.isNaN(payload.branch_id)) {
+      alert("Please assign a branch for the new account.");
+      return;
+    }
 
     try {
       const res = await fetch(apiUrl("/api/auth/register"), {
@@ -101,7 +126,12 @@ export default function AdminPage() {
       
       if (res.ok) {
         setIsModalOpen(false);
-        setProvisionData({ username: "", password: "", role: "employee", branch_id: "" });
+        setProvisionData({
+          username: "",
+          password: "",
+          role: availableRoles[0]?.value || "employee",
+          branch_id: currentUser.role === "branch_admin" ? String(currentUser.branch_id) : ""
+        });
         fetchData();
       } else {
         const errData = await res.json();
@@ -456,10 +486,11 @@ export default function AdminPage() {
                        onChange={(e) => setProvisionData({...provisionData, role: e.target.value})}
                        className="w-full bg-brand-bgbase border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all appearance-none"
                      >
-                        <option value="employee" className="bg-brand-surface">Staff</option>
-                        {currentUser?.role === 'super_admin' && (
-                          <option value="branch_admin" className="bg-brand-surface">Manager</option>
-                        )}
+                        {availableRoles.map((roleOption) => (
+                          <option key={roleOption.value} value={roleOption.value} className="bg-brand-surface">
+                            {roleOption.label}
+                          </option>
+                        ))}
                      </select>
                   </div>
 
@@ -470,8 +501,11 @@ export default function AdminPage() {
                        onChange={(e) => setProvisionData({...provisionData, branch_id: e.target.value})}
                        className="w-full bg-brand-bgbase border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all appearance-none"
                        disabled={currentUser?.role === 'branch_admin'}
+                       required
                      >
-                        <option value="" className="bg-brand-surface">Global Hub</option>
+                        {currentUser?.role !== 'branch_admin' && (
+                          <option value="" className="bg-brand-surface">Select Branch</option>
+                        )}
                         {branches.map(b => (
                            <option key={b.id} value={b.id} className="bg-brand-surface">{b.name}</option>
                         ))}

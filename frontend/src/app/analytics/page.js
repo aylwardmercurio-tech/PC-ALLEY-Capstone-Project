@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import TopBar from "../../components/TopBar";
 import StatCard from "../../components/StatCard";
+import { useTheme } from "../../context/ThemeContext";
+import { getChartTheme } from "../../lib/chartTheme";
 import {
   BarChart3,
   TrendingUp,
@@ -48,6 +50,8 @@ ChartJS.register(
 
 export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
+  const { theme } = useTheme();
+  const chartTheme = getChartTheme(theme);
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 800);
@@ -147,14 +151,14 @@ export default function AnalyticsPage() {
                         tension: 0.4,
                         fill: true,
                         pointBackgroundColor: '#00F2FF',
-                        pointBorderColor: 'rgba(var(--brand-bgbase-rgb), 1)',
+                        pointBorderColor: chartTheme.pointBorderColor,
                         pointBorderWidth: 2,
                         pointRadius: 4,
                       },
                       {
                         label: 'Base Vector',
                         data: velocityData.map(v => v * 0.8),
-                        borderColor: 'rgba(var(--text-main-rgb), 0.1)',
+                        borderColor: chartTheme.mutedLineColor,
                         backgroundColor: 'transparent',
                         borderWidth: 2,
                         tension: 0.4,
@@ -173,21 +177,21 @@ export default function AnalyticsPage() {
                       tooltip: {
                         mode: 'index',
                         intersect: false,
-                        backgroundColor: 'rgba(var(--brand-panel-rgb), 0.9)',
-                        titleColor: 'rgb(var(--text-main-rgb))',
-                        bodyColor: 'rgba(var(--text-main-rgb), 0.7)',
-                        borderColor: 'rgba(var(--brand-border-rgb), 0.1)',
+                        backgroundColor: chartTheme.tooltipBackgroundColor,
+                        titleColor: chartTheme.tooltipTitleColor,
+                        bodyColor: chartTheme.tooltipBodyColor,
+                        borderColor: chartTheme.tooltipBorderColor,
                         borderWidth: 1,
                       }
                     },
                     scales: {
                       y: {
-                        grid: { color: 'rgba(var(--text-main-rgb), 0.05)', drawBorder: false },
-                        ticks: { color: 'rgba(var(--text-main-rgb), 0.5)', font: { size: 10, family: 'DM Sans' } }
+                        grid: { color: chartTheme.gridColor, drawBorder: false },
+                        ticks: { color: chartTheme.tickColor, font: { size: 10, family: 'DM Sans' } }
                       },
                       x: {
                         grid: { display: false, drawBorder: false },
-                        ticks: { color: 'rgba(var(--text-main-rgb), 0.5)', font: { size: 10, family: 'DM Sans' } }
+                        ticks: { color: chartTheme.tickColor, font: { size: 10, family: 'DM Sans' } }
                       }
                     },
                     interaction: { mode: 'nearest', axis: 'x', intersect: false }

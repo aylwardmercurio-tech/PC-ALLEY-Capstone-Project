@@ -13,7 +13,11 @@ router.post('/register', [
     .notEmpty()
     .withMessage('Username or internal ID is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').isIn(['super_admin', 'branch_admin', 'employee']).withMessage('Invalid role designation'),
+  body('role').isIn(['branch_admin', 'employee']).withMessage('Invalid role designation'),
+  body('branch_id')
+    .optional({ nullable: true, checkFalsy: true })
+    .isInt({ min: 1 })
+    .withMessage('Branch assignment must be a valid branch'),
   validate,
   register
 ]); 

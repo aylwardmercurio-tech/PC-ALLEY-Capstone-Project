@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { apiUrl, getApiErrorMessage } from "../../lib/api";
+import { useTheme } from "../../context/ThemeContext";
+import { getChartTheme } from "../../lib/chartTheme";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -50,6 +52,8 @@ export default function InventoryPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [adjustValue, setAdjustValue] = useState(0);
   const [adjustThreshold, setAdjustThreshold] = useState(5);
+  const { theme } = useTheme();
+  const chartTheme = getChartTheme(theme);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
@@ -187,8 +191,8 @@ export default function InventoryPage() {
       legend: { display: false },
     },
     scales: {
-      y: { grid: { color: 'rgba(var(--text-main-rgb), 0.05)' }, ticks: { color: 'rgba(var(--text-main-rgb), 0.5)' } },
-      x: { grid: { display: false }, ticks: { color: 'rgba(var(--text-main-rgb), 0.5)' } }
+      y: { grid: { color: chartTheme.gridColor }, ticks: { color: chartTheme.tickColor } },
+      x: { grid: { display: false }, ticks: { color: chartTheme.tickColor } }
     }
   };
 

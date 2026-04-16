@@ -6,15 +6,49 @@ const register = async (req, res) => {
   try {
     const { password, role, branch_id } = req.body;
     const username = String(req.body.username || '').trim().toLowerCase();
-    
-    // Enforcement: Branch Managers can only create employees for their branch
-    if (req.user.role === 'branch_admin') {
-      if (role !== 'employee') {
-        return res.status(403).json({ message: 'Managers can only provision Staff/Employee accounts' });
-      }
-      if (branch_id !== req.user.branch_id) {
-        return res.status(403).json({ message: 'Managers can only provision accounts for their own sector' });
-      }
+
+    if (!username) {
+      return res.status(400).json({ message: 'Username or internal ID is required' });
+    }
+
+    const allowedRolesByCreator = {
+      super_admin: ['branch_admin', 'employee'],
+      branch_admin: ['employee']
+    };
+
+    const allowedRoles = allowedRolesByCreator[req.user.role] || [];
+    if (!allowedRoles.includes(role)) {
+      return res.status(403).json({
+        message: req.user.role === 'branch_admin'
+          ? 'Managers can only provision Staff accounts'
+          : 'Admins can only provision Manager or Staff accounts'
+      });
+    }
+
+    const normalizedBranchId = req.user.role === 'branch_admin'
+      ? Number(req.user.branch_id)
+      : (branch_id === '' || branch_id === null || typeof branch_id === 'undefined' ? null : Number(branch_id));
+
+    if (!normalizedBranchId) {
+      return res.status(400).json({ message: 'A branch assignment is required for Manager and Staff accounts' });
+    }
+
+    if (Number.isNaN(normalizedBranchId)) {
+      return res.status(400).json({ message: 'Invalid branch assignment' });
+    }
+
+    if (req.user.role === 'branch_admin' && normalizedBranchId !== Number(req.user.branch_id)) {
+      return res.status(403).json({ message: 'Managers can only provision accounts for their own sector' });
+    }
+
+    const branch = await Branch.findByPk(normalizedBranchId);
+    if (!branch) {
+      return res.status(404).json({ message: 'Assigned branch does not exist' });
+    }
+
+    const existingUser = await User.findOne({ where: { username } });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Username already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -22,7 +56,7 @@ const register = async (req, res) => {
       username,
       password: hashedPassword,
       role,
-      branch_id: branch_id === '' ? null : branch_id
+      branch_id: normalizedBranchId
     });
     res.status(201).json({ message: 'User provisioned successfully', userId: user.id });
   } catch (error) {

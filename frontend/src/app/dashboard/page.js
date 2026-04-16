@@ -21,6 +21,8 @@ import {
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
 import StatCard from "../../components/StatCard";
+import { useTheme } from "../../context/ThemeContext";
+import { getChartTheme } from "../../lib/chartTheme";
 
 ChartJS.register(
   CategoryScale,
@@ -36,6 +38,8 @@ ChartJS.register(
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
+  const { theme } = useTheme();
+  const chartTheme = getChartTheme(theme);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -58,7 +62,7 @@ export default function Dashboard() {
         tension: 0.4,
         fill: true,
         pointBackgroundColor: '#FF3B4E',
-        pointBorderColor: 'rgba(var(--brand-bgbase-rgb), 1)',
+        pointBorderColor: chartTheme.pointBorderColor,
         pointBorderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6,
@@ -72,7 +76,7 @@ export default function Dashboard() {
         tension: 0.4,
         fill: false,
         pointBackgroundColor: '#2563C4',
-        pointBorderColor: 'rgba(var(--brand-bgbase-rgb), 1)',
+        pointBorderColor: chartTheme.pointBorderColor,
         pointBorderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6,
@@ -90,10 +94,10 @@ export default function Dashboard() {
       tooltip: {
         mode: 'index',
         intersect: false,
-        backgroundColor: 'rgba(var(--brand-panel-rgb), 0.9)',
-        titleColor: 'rgb(var(--text-main-rgb))',
-        bodyColor: 'rgba(var(--text-main-rgb), 0.7)',
-        borderColor: 'rgba(var(--brand-border-rgb), 0.1)',
+        backgroundColor: chartTheme.tooltipBackgroundColor,
+        titleColor: chartTheme.tooltipTitleColor,
+        bodyColor: chartTheme.tooltipBodyColor,
+        borderColor: chartTheme.tooltipBorderColor,
         borderWidth: 1,
       }
     },
@@ -103,18 +107,18 @@ export default function Dashboard() {
         max: 360,
         ticks: {
           stepSize: 20,
-          color: 'rgba(var(--text-main-rgb), 0.5)',
+          color: chartTheme.tickColor,
           font: { size: 10, family: 'DM Sans' },
           callback: (value) => '₱' + value + 'k'
         },
         grid: {
-          color: 'rgba(var(--text-main-rgb), 0.05)',
+          color: chartTheme.gridColor,
           drawBorder: false,
         }
       },
       x: {
         ticks: {
-          color: 'rgba(var(--text-main-rgb), 0.5)',
+          color: chartTheme.tickColor,
           font: { size: 10, family: 'DM Sans' }
         },
         grid: {
