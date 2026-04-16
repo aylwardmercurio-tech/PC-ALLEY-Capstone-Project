@@ -12,6 +12,7 @@ import {
   Calendar,
   Download,
   Filter,
+  DollarSign,
   ArrowUpRight,
   Target,
   Zap,
@@ -80,42 +81,35 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Main KPIs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-white/40 mb-3 text-cyan-400">Total Revenue</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">₱8.42M</div>
-               <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                 <span className="text-cyan-400 font-bold flex items-center gap-1">▲ 1.2M</span>
-                 <span>Monthly Flow</span>
-               </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-white/40 mb-3 text-brand-crimson">Net Yield</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">₱1.85M</div>
-               <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                 <span className="text-brand-crimson font-bold flex items-center gap-1">+8.1%</span>
-                 <span>System Profit</span>
-               </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-white/40 mb-3 text-brand-neonpurple">Efficiency</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">84%</div>
-               <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                 <span className="text-white/40 font-bold flex items-center gap-1">OPTIMAL</span>
-                 <span>Network Load</span>
-               </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Core Usage</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">92%</div>
-               <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                 <span className="text-green-400 font-bold flex items-center gap-1">HIGH</span>
-                 <span>Resource Allocation</span>
-               </div>
-            </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <StatCard 
+              title="Total Revenue" 
+              value="₱8.42M" 
+              trend="▲ 1.2M" 
+              subtext="Monthly Flow" 
+              icon={DollarSign}
+            />
+            <StatCard 
+              title="Net Yield" 
+              value="₱1.85M" 
+              trend="+8.1%" 
+              subtext="System Profit" 
+              icon={TrendingUp}
+            />
+            <StatCard 
+              title="Efficiency" 
+              value="84%" 
+              trend="OPTIMAL" 
+              subtext="Network Load" 
+              icon={Activity}
+            />
+            <StatCard 
+              title="Core Usage" 
+              value="92%" 
+              trend="HIGH" 
+              subtext="Resource Allocation" 
+              icon={Cpu}
+            />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -123,9 +117,9 @@ export default function AnalyticsPage() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="lg:col-span-2 bg-brand-surface/80 border-border rounded-2xl p-8 lg:p-10 flex flex-col"
+              className="lg:col-span-2 bg-brand-surface/80 border border-border rounded-2xl p-6 md:p-8 lg:p-10 flex flex-col shadow-sm"
             >
-              <div className="flex justify-between items-center mb-8">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-4 bg-brand-neonblue/20 rounded-full" />
                   <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">Velocity Matrix</h3>
@@ -207,7 +201,7 @@ export default function AnalyticsPage() {
                initial={{ opacity: 0, scale: 0.98 }}
                animate={{ opacity: 1, scale: 1 }}
                transition={{ delay: 0.1 }}
-               className="bg-brand-surface/80 border-border rounded-2xl p-8 lg:p-10 flex flex-col shadow-sm"
+               className="bg-brand-surface/80 border border-border rounded-2xl p-6 md:p-8 lg:p-10 flex flex-col shadow-sm"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -245,7 +239,7 @@ export default function AnalyticsPage() {
 
           {/* Bottom Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10">
-            <div className="bg-brand-surface/80 border-border rounded-2xl p-8 lg:p-10 shadow-sm">
+            <div className="bg-brand-surface/80 border border-border rounded-2xl p-6 md:p-8 lg:p-10 shadow-sm">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-1 h-4 bg-muted/20 rounded-full" />
                 <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">Matrix Allocation</h3>
@@ -276,8 +270,8 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            <div className="bg-brand-surface/80 border-border rounded-2xl p-8 lg:p-10 shadow-sm">
-              <div className="flex justify-between items-center mb-8">
+            <div className="bg-brand-surface/80 border border-border rounded-2xl p-6 md:p-8 lg:p-10 shadow-sm">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-4 bg-muted/20 rounded-full" />
                   <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">Sector Performance</h3>

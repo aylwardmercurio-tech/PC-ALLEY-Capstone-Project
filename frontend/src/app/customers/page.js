@@ -66,42 +66,35 @@ export default function CustomersPage() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10 custom-scrollbar relative z-10 bg-brand-bgbase text-main">
           {/* Header KPIs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group shadow-sm">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Total Base</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">2,482</div>
-               <div className="flex items-center gap-1.5 text-xs text-muted/70">
-                 <span className="text-green-400 font-bold flex items-center gap-1">▲ 12.5%</span>
-                 <span>Personnel Link</span>
-               </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group shadow-sm">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3 text-cyan-400">VIP Sector</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">124</div>
-               <div className="flex items-center gap-1.5 text-xs text-muted/70">
-                 <span className="text-cyan-400 font-bold flex items-center gap-1">▲ 5.2%</span>
-                 <span>High-Value Core</span>
-               </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group shadow-sm">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3 text-brand-neonpurple">Active Leads</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">48</div>
-               <div className="flex items-center gap-1.5 text-xs text-muted/70">
-                 <span className="text-muted/40 font-bold flex items-center gap-1">STABLE</span>
-                 <span>Current Cycle</span>
-               </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group shadow-sm">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Retention</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">92%</div>
-               <div className="flex items-center gap-1.5 text-xs text-muted/70">
-                 <span className="text-green-400 font-bold flex items-center gap-1">OPTIMUM</span>
-                 <span>Network Stability</span>
-               </div>
-            </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <StatCard 
+              title="Total Base" 
+              value="2,482" 
+              trend="▲ 12.5%" 
+              subtext="Personnel Link" 
+              icon={Users}
+            />
+            <StatCard 
+              title="VIP Sector" 
+              value="124" 
+              trend="▲ 5.2%" 
+              subtext="High-Value Core" 
+              icon={Award}
+            />
+            <StatCard 
+              title="Active Leads" 
+              value="48" 
+              trend="STABLE" 
+              subtext="Current Cycle" 
+              icon={TrendingUp}
+            />
+            <StatCard 
+              title="Retention" 
+              value="92%" 
+              trend="OPTIMUM" 
+              subtext="Network Stability" 
+              icon={Globe}
+            />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -181,7 +174,7 @@ export default function CustomersPage() {
              className="bg-brand-surface border border-border rounded-2xl p-6 lg:p-8 shadow-sm"
           >
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-              <div className="relative group flex-1 w-full max-w-md">
+              <div className="relative group w-full md:max-w-md">
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-brand-neonblue transition-colors" />
                 <input 
                   type="text" 
@@ -189,7 +182,7 @@ export default function CustomersPage() {
                   className="w-full bg-brand-bgbase border border-border rounded-xl py-2.5 pl-11 pr-4 text-xs text-main focus:outline-none focus:border-brand-neonblue/30 transition-all font-bold"
                 />
               </div>
-              <button className="h-11 px-6 bg-brand-crimson hover:bg-red-700 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-white transition-all shadow-lg shadow-brand-crimson/20">
+              <button className="h-11 w-full md:w-auto px-6 bg-brand-crimson hover:bg-red-700 rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-main transition-all shadow-lg shadow-brand-crimson/20">
                 <UserPlus size={18} /> Register Personnel
               </button>
             </div>
@@ -209,7 +202,7 @@ export default function CustomersPage() {
                 </thead>
                 <tbody className="text-sm">
                   {loading ? (
-                    <tr><td colSpan="7" className="py-32 text-center text-[10px] font-bold uppercase tracking-[4px] text-white/10 animate-pulse">Syncing Network Base...</td></tr>
+                    <tr><td colSpan="7" className="py-32 text-center text-[10px] font-bold uppercase tracking-[4px] text-muted animate-pulse">Syncing Network Base...</td></tr>
                   ) : (
                     customers.map((client, i) => (
                       <tr 

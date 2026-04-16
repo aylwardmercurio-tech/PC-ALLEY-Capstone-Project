@@ -18,6 +18,7 @@ import {
   Fingerprint
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { apiUrl } from "../../lib/api";
 
 export default function AdminPage() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -56,8 +57,8 @@ export default function AdminPage() {
     const token = localStorage.getItem("token");
     try {
       const [uRes, bRes] = await Promise.all([
-        fetch("http://localhost:5000/api/auth/users", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("http://localhost:5000/api/branches", { headers: { Authorization: `Bearer ${token}` } })
+        fetch(apiUrl("/api/auth/users"), { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(apiUrl("/api/branches"), { headers: { Authorization: `Bearer ${token}` } })
       ]);
       
       const uData = await uRes.json();
@@ -89,7 +90,7 @@ export default function AdminPage() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(apiUrl("/api/auth/register"), {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -102,9 +103,18 @@ export default function AdminPage() {
         setIsModalOpen(false);
         setProvisionData({ username: "", password: "", role: "employee", branch_id: "" });
         fetchData();
+      } else {
+        const errData = await res.json();
+        if (errData.errors && Array.isArray(errData.errors)) {
+          const msgs = errData.errors.map(e => Object.values(e)[0]).join('\n');
+          alert(`Validation Failed:\n${msgs}`);
+        } else {
+          alert(errData.message || "Failed to provision personnel");
+        }
       }
     } catch (err) {
        console.error("Provisioning Error:", err);
+       alert("Network connection error");
     }
   };
 
@@ -112,7 +122,7 @@ export default function AdminPage() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:5000/api/branches", {
+      const res = await fetch(apiUrl("/api/branches"), {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -135,7 +145,7 @@ export default function AdminPage() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:5000/api/branches/${editingBranch.id}`, {
+      const res = await fetch(apiUrl(`/api/branches/${editingBranch.id}`), {
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",
@@ -177,27 +187,27 @@ export default function AdminPage() {
             <motion.div 
                initial={{ opacity: 0, scale: 0.98 }}
                animate={{ opacity: 1, scale: 1 }}
-               className="lg:col-span-2 bg-brand-surface border border-border rounded-2xl p-6 lg:p-8 overflow-hidden shadow-sm"
+               className="lg:col-span-2 bg-brand-surface border border-border rounded-2xl p-5 md:p-6 lg:p-8 overflow-hidden shadow-sm"
             >
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-4 bg-brand-neonblue/50 rounded-full" />
                   <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">User Registry</h3>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-3 md:gap-4">
                   {currentUser?.role === 'super_admin' && (
                     <button 
                       onClick={() => setIsBranchModalOpen(true)}
-                      className="h-10 px-5 bg-brand-surface border border-border rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-muted hover:bg-brand-neonblue hover:text-white transition-all group"
+                      className="h-10 px-4 md:px-5 bg-brand-surface border border-border rounded-xl flex items-center gap-3 text-[9px] md:text-[10px] font-black uppercase tracking-[2px] text-muted hover:bg-brand-neonblue hover:text-main transition-all group flex-1 md:flex-none justify-center"
                     >
                        Create Sector
                     </button>
                   )}
                   <button 
                     onClick={() => setIsModalOpen(true)}
-                    className="h-10 px-5 bg-brand-surface border border-border rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-muted hover:bg-brand-crimson hover:text-white transition-all group"
+                    className="h-10 px-4 md:px-5 bg-brand-surface border border-border rounded-xl flex items-center gap-3 text-[9px] md:text-[10px] font-black uppercase tracking-[2px] text-muted hover:bg-brand-crimson hover:text-main transition-all group flex-1 md:flex-none justify-center"
                   >
-                     Provision Personnel
+                     Create Account
                   </button>
                 </div>
               </div>
@@ -262,7 +272,7 @@ export default function AdminPage() {
                initial={{ opacity: 0, scale: 0.98 }}
                animate={{ opacity: 1, scale: 1 }}
                transition={{ delay: 0.1 }}
-               className="bg-brand-surface border border-border rounded-2xl p-8 lg:p-10 flex flex-col h-[500px] lg:h-auto shadow-sm"
+               className="bg-brand-surface border border-border rounded-2xl p-5 md:p-8 lg:p-10 flex flex-col h-[500px] lg:h-auto shadow-sm"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -274,7 +284,7 @@ export default function AdminPage() {
 
               <div className="flex-1 space-y-6 overflow-y-auto no-scrollbar">
                 {activityLogs.map((log, i) => (
-                  <div key={log.id} className="relative pl-6 pb-6 border-l border-white/5 last:pb-0">
+                  <div key={log.id} className="relative pl-6 pb-6 border-l border-border last:pb-0">
                     <div className={`absolute left-[-4.5px] top-0 w-2 h-2 rounded-full ${
                       log.status === 'Alert' ? 'bg-brand-crimson shadow-[0_0_8px_#D72638]' : 'bg-brand-neonblue shadow-[0_0_8px_#00F2FF]'
                     }`} />
@@ -304,7 +314,7 @@ export default function AdminPage() {
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ delay: 0.2 }}
-             className="bg-brand-surface border border-border rounded-2xl p-6 lg:p-8 mb-8 overflow-hidden shadow-sm"
+             className="bg-brand-surface border border-border rounded-2xl p-5 md:p-6 lg:p-8 mb-8 overflow-hidden shadow-sm"
           >
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
@@ -321,7 +331,7 @@ export default function AdminPage() {
                     <th className="pb-4 px-4">Designation</th>
                     <th className="pb-4 px-4">Coordinates</th>
                     <th className="pb-4 px-4">Uplink</th>
-                    <th className="pb-4 pl-4 text-right">Ops</th>
+                    {currentUser?.role === 'super_admin' && <th className="pb-4 pl-4 text-right">Ops</th>}
                   </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -339,14 +349,16 @@ export default function AdminPage() {
                       <td className="py-4 px-4 text-[11px] text-muted-40 font-mono">
                         {branch.phone || "---"}
                       </td>
-                      <td className="py-4 pl-4 text-right">
-                         <button 
-                           onClick={() => openEditModal(branch)}
-                           className="px-4 py-1.5 bg-brand-surface border border-border rounded-lg text-[9px] font-black uppercase tracking-widest text-muted hover:bg-brand-neonblue hover:text-white transition-all shadow-sm"
-                         >
-                           Reconfigure
-                         </button>
-                      </td>
+                      {currentUser?.role === 'super_admin' && (
+                        <td className="py-4 pl-4 text-right">
+                           <button 
+                             onClick={() => openEditModal(branch)}
+                             className="px-4 py-1.5 bg-brand-surface border border-border rounded-lg text-[9px] font-black uppercase tracking-widest text-muted hover:bg-brand-neonblue hover:text-main transition-all shadow-sm"
+                           >
+                             Reconfigure
+                           </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -359,21 +371,21 @@ export default function AdminPage() {
              initial={{ opacity: 0, y: 10 }} 
              animate={{ opacity: 1, y: 0 }}
              transition={{ delay: 0.3 }}
-             className="bg-[#121826]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 lg:p-8 flex items-center justify-between relative overflow-hidden group mb-8"
+             className="bg-[#121826]/80 backdrop-blur-xl border border-border rounded-2xl p-6 lg:p-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden group mb-8 gap-6 md:gap-0"
           >
              <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-brand-crimson/5 to-transparent pointer-events-none" />
              
-             <div className="flex items-center gap-6 relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-brand-surface border border-border flex items-center justify-center">
-                   <Shield size={24} className="text-brand-crimson" />
+             <div className="flex items-center gap-4 md:gap-6 relative z-10 w-full md:w-auto">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand-surface border border-border flex items-center justify-center shrink-0">
+                   <Shield size={20} className="md:size-[24px] text-brand-crimson" />
                 </div>
                 <div>
-                   <h3 className="text-sm font-rajdhani font-bold tracking-[2px] uppercase text-main">Shield Protocol Active</h3>
-                   <p className="text-[10px] text-muted uppercase tracking-widest">Distributed Ledger Encryption active (AES-256)</p>
+                   <h3 className="text-[12px] md:text-sm font-rajdhani font-bold tracking-[2px] uppercase text-main">Shield Protocol Active</h3>
+                   <p className="text-[9px] md:text-[10px] text-muted uppercase tracking-widest">Distributed Ledger Encryption active (AES-256)</p>
                 </div>
              </div>
              
-             <div className="flex items-center gap-8 relative z-10">
+             <div className="flex items-center gap-8 relative z-10 w-full md:w-auto justify-end md:justify-start">
                 <div className="text-right">
                    <p className="text-[8px] font-black text-muted uppercase mb-1">Threat Level</p>
                    <p className="text-[10px] font-black text-green-400 uppercase tracking-widest">OPTIMAL</p>
@@ -402,27 +414,27 @@ export default function AdminPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-lg bg-[#0E121A] border border-white/10 rounded-[32px] p-10 relative z-10 shadow-2xl overflow-hidden"
+              className="w-full max-w-lg bg-[#0E121A] border border-border rounded-[32px] p-6 md:p-10 relative z-10 shadow-2xl overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-crimson/10 blur-[80px] pointer-events-none" />
               
               <div className="mb-10">
-                <h3 className="text-xl font-rajdhani font-black tracking-[4px] uppercase text-main mb-2">Access Provisioning</h3>
+                <h3 className="text-xl font-rajdhani font-black tracking-[4px] uppercase text-main mb-2">Account Creation</h3>
                 <p className="text-[10px] text-muted font-bold uppercase tracking-widest">Generate new personnel authorization credentials</p>
               </div>
 
               <form onSubmit={handleProvision} className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Logical Identifier (Email)</label>
+                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Logical Identifier</label>
                    <input 
-                     type="email" 
+                     type="text" 
                      required
                      value={provisionData.username}
                      onChange={(e) => setProvisionData({...provisionData, username: e.target.value})}
                      className="w-full bg-brand-bgbase border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all"
-                     placeholder="personnel@pcalley.com"
+                     placeholder="personnel@pcalley.com or manager_sta_cruz@branch"
                    />
-                </div>
+                 </div>
 
                 <div className="space-y-2">
                    <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Security Access Key</label>
@@ -443,22 +455,21 @@ export default function AdminPage() {
                        value={provisionData.role}
                        onChange={(e) => setProvisionData({...provisionData, role: e.target.value})}
                        className="w-full bg-brand-bgbase border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all appearance-none"
-                       disabled={currentUser?.role === 'branch_admin'}
                      >
-                        <option value="employee" className="bg-brand-surface">Staff Associate</option>
-                        <option value="branch_admin" className="bg-brand-surface">Branch Manager</option>
-                        <option value="super_admin" className="bg-brand-surface">Super Admin</option>
+                        <option value="employee" className="bg-brand-surface">Staff</option>
+                        {currentUser?.role === 'super_admin' && (
+                          <option value="branch_admin" className="bg-brand-surface">Manager</option>
+                        )}
                      </select>
                   </div>
 
                   <div className="space-y-2">
                      <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Logical Sector</label>
                      <select 
-                       value={provisionData.branch_id}
+                       value={currentUser?.role === 'branch_admin' ? currentUser.branch_id : provisionData.branch_id}
                        onChange={(e) => setProvisionData({...provisionData, branch_id: e.target.value})}
                        className="w-full bg-brand-bgbase border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all appearance-none"
                        disabled={currentUser?.role === 'branch_admin'}
-                       required={currentUser?.role === 'super_admin'}
                      >
                         <option value="" className="bg-brand-surface">Global Hub</option>
                         {branches.map(b => (
@@ -478,9 +489,9 @@ export default function AdminPage() {
                   </button>
                   <button 
                      type="submit"
-                     className="flex-[2] py-4 bg-brand-crimson hover:bg-red-700 rounded-2xl text-[10px] font-black uppercase tracking-[3px] text-white shadow-lg shadow-brand-crimson/20 transition-all active:scale-[0.98]"
+                     className="flex-[2] py-4 bg-brand-crimson hover:bg-red-700 rounded-2xl text-[10px] font-black uppercase tracking-[3px] text-main shadow-lg shadow-brand-crimson/20 transition-all active:scale-[0.98]"
                   >
-                    Initialize Provisioning
+                     Register Account
                   </button>
                 </div>
               </form>
@@ -504,46 +515,46 @@ export default function AdminPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-lg bg-[#0E121A] border border-white/10 rounded-[32px] p-10 relative z-10 shadow-2xl overflow-hidden"
+              className="w-full max-w-lg bg-[#0E121A] border border-border rounded-[32px] p-6 md:p-10 relative z-10 shadow-2xl overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-neonblue/10 blur-[80px] pointer-events-none" />
               
               <div className="mb-10">
-                <h3 className="text-xl font-rajdhani font-black tracking-[4px] uppercase text-white mb-2">Initialize Sector</h3>
-                <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Establish a new logical branch in the ERP core</p>
+                <h3 className="text-xl font-rajdhani font-black tracking-[4px] uppercase text-main mb-2">Initialize Sector</h3>
+                <p className="text-[10px] text-muted font-bold uppercase tracking-widest">Establish a new logical branch in the ERP core</p>
               </div>
 
               <form onSubmit={handleCreateBranch} className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-[9px] font-black uppercase tracking-[3px] text-white/20 ml-2">Sector Designation (Name)</label>
+                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Sector Designation (Name)</label>
                    <input 
                      type="text" 
                      required
                      value={branchData.name}
                      onChange={(e) => setBranchData({...branchData, name: e.target.value})}
-                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-brand-neonblue transition-all"
+                     className="w-full bg-main/5 border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all"
                      placeholder="e.g. Branch D - Northern Spire"
                    />
                 </div>
 
                 <div className="space-y-2">
-                   <label className="text-[9px] font-black uppercase tracking-[3px] text-white/20 ml-2">Geographic Coordinates (Address)</label>
+                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Geographic Coordinates (Address)</label>
                    <input 
                      type="text" 
                      value={branchData.location}
                      onChange={(e) => setBranchData({...branchData, location: e.target.value})}
-                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-brand-neonblue transition-all"
+                     className="w-full bg-main/5 border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all"
                      placeholder="Business District, Quezon City"
                    />
                 </div>
 
                 <div className="space-y-2">
-                   <label className="text-[9px] font-black uppercase tracking-[3px] text-white/20 ml-2">Comms Uplink (Phone)</label>
+                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Comms Uplink (Phone)</label>
                    <input 
                      type="text" 
                      value={branchData.phone}
                      onChange={(e) => setBranchData({...branchData, phone: e.target.value})}
-                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-brand-neonblue transition-all"
+                     className="w-full bg-main/5 border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all"
                      placeholder="0917-000-0000"
                    />
                 </div>
@@ -552,13 +563,13 @@ export default function AdminPage() {
                   <button 
                     type="button"
                     onClick={() => setIsBranchModalOpen(false)}
-                    className="flex-1 py-4 rounded-2xl border border-white/5 text-[10px] font-black uppercase tracking-[3px] text-white/20 hover:text-white hover:bg-white/5 transition-all"
+                    className="flex-1 py-4 rounded-2xl border border-border text-[10px] font-black uppercase tracking-[3px] text-muted hover:text-main hover:bg-main/5 transition-all"
                   >
                    Abort
                   </button>
                   <button 
                      type="submit"
-                     className="flex-[2] py-4 bg-brand-neonblue hover:bg-blue-700 rounded-2xl text-[10px] font-black uppercase tracking-[3px] text-white shadow-lg shadow-brand-neonblue/20 transition-all active:scale-[0.98]"
+                     className="flex-[2] py-4 bg-brand-neonblue hover:bg-blue-700 rounded-2xl text-[10px] font-black uppercase tracking-[3px] text-main shadow-lg shadow-brand-neonblue/20 transition-all active:scale-[0.98]"
                   >
                     Establish Link
                   </button>
@@ -583,44 +594,44 @@ export default function AdminPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-lg bg-[#0E121A] border border-white/10 rounded-[32px] p-10 relative z-10 shadow-2xl overflow-hidden"
+              className="w-full max-w-lg bg-[#0E121A] border border-border rounded-[32px] p-6 md:p-10 relative z-10 shadow-2xl overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-neonblue/10 blur-[80px] pointer-events-none" />
               
               <div className="mb-10">
-                <h3 className="text-xl font-rajdhani font-black tracking-[4px] uppercase text-white mb-2">Reconfigure Sector</h3>
-                <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Update parameters for {editingBranch?.name}</p>
+                <h3 className="text-xl font-rajdhani font-black tracking-[4px] uppercase text-main mb-2">Reconfigure Sector</h3>
+                <p className="text-[10px] text-muted font-bold uppercase tracking-widest">Update parameters for {editingBranch?.name}</p>
               </div>
 
               <form onSubmit={handleUpdateBranch} className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-[9px] font-black uppercase tracking-[3px] text-white/20 ml-2">Sector Designation</label>
+                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Sector Designation</label>
                    <input 
                      type="text" 
                      required
                      value={branchData.name}
                      onChange={(e) => setBranchData({...branchData, name: e.target.value})}
-                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-brand-neonblue transition-all"
+                     className="w-full bg-main/5 border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all"
                    />
                 </div>
 
                 <div className="space-y-2">
-                   <label className="text-[9px] font-black uppercase tracking-[3px] text-white/20 ml-2">Coordinates</label>
+                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Coordinates</label>
                    <input 
                      type="text" 
                      value={branchData.location}
                      onChange={(e) => setBranchData({...branchData, location: e.target.value})}
-                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-brand-neonblue transition-all"
+                     className="w-full bg-main/5 border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all"
                    />
                 </div>
 
                 <div className="space-y-2">
-                   <label className="text-[9px] font-black uppercase tracking-[3px] text-white/20 ml-2">Uplink</label>
+                   <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Uplink</label>
                    <input 
                      type="text" 
                      value={branchData.phone}
                      onChange={(e) => setBranchData({...branchData, phone: e.target.value})}
-                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-brand-neonblue transition-all"
+                     className="w-full bg-main/5 border border-border rounded-2xl py-4 px-6 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all"
                    />
                 </div>
 
@@ -628,13 +639,13 @@ export default function AdminPage() {
                   <button 
                     type="button"
                     onClick={() => setIsEditModalOpen(false)}
-                    className="flex-1 py-4 rounded-2xl border border-white/5 text-[10px] font-black uppercase tracking-[3px] text-white/20 hover:text-white hover:bg-white/5 transition-all"
+                    className="flex-1 py-4 rounded-2xl border border-border text-[10px] font-black uppercase tracking-[3px] text-muted hover:text-main hover:bg-main/5 transition-all"
                   >
                    Abort
                   </button>
                   <button 
                      type="submit"
-                     className="flex-[2] py-4 bg-brand-neonblue hover:bg-blue-700 rounded-2xl text-[10px] font-black uppercase tracking-[3px] text-white shadow-lg shadow-brand-neonblue/20 transition-all active:scale-[0.98]"
+                     className="flex-[2] py-4 bg-brand-neonblue hover:bg-blue-700 rounded-2xl text-[10px] font-black uppercase tracking-[3px] text-main shadow-lg shadow-brand-neonblue/20 transition-all active:scale-[0.98]"
                   >
                     Sync Parameters
                   </button>

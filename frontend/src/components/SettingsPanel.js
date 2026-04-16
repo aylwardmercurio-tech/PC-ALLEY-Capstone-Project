@@ -71,17 +71,17 @@ const SettingsPanel = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-brand-deep border-l border-white/5 shadow-2xl z-[101] flex flex-col font-dm-sans"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-brand-deep border-l border-border shadow-2xl z-[101] flex flex-col font-dm-sans"
           >
             {/* Header */}
-            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+            <div className="p-8 border-b border-border flex items-center justify-between bg-white/[0.02]">
               <div>
                 <h2 className="text-xl font-rajdhani font-bold tracking-wider uppercase">System Config</h2>
                 <p className="text-[10px] text-brand-muted font-bold tracking-[2px] uppercase mt-1">Terminal ID: PC-AL-001</p>
               </div>
               <button
                 onClick={onClose}
-                className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-brand-crimson hover:text-white transition-all group"
+                className="w-10 h-10 rounded-xl bg-main/5 flex items-center justify-center hover:bg-brand-crimson hover:text-main transition-all group"
               >
                 <X size={18} className="group-hover:rotate-90 transition-transform" />
               </button>
@@ -90,13 +90,13 @@ const SettingsPanel = ({ isOpen, onClose }) => {
             {/* Layout */}
             <div className="flex-1 flex overflow-hidden">
               {/* Sidebar Tabs */}
-              <div className="w-20 border-r border-white/5 py-8 flex flex-col items-center gap-6">
+              <div className="w-20 border-r border-border py-8 flex flex-col items-center gap-6">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all relative ${
-                      activeTab === tab.id ? "bg-brand-crimson text-white shadow-lg shadow-brand-crimson/20" : "text-brand-muted hover:text-white hover:bg-white/5"
+                      activeTab === tab.id ? "bg-brand-crimson text-main shadow-lg shadow-brand-crimson/20" : "text-brand-muted hover:text-main hover:bg-main/5"
                     }`}
                     title={tab.label}
                   >
@@ -120,14 +120,14 @@ const SettingsPanel = ({ isOpen, onClose }) => {
                   >
                     {activeTab === "profile" && (
                       <div className="space-y-6">
-                        <h3 className="text-sm font-bold uppercase tracking-[2px] text-white">Identity Core</h3>
+                        <h3 className="text-sm font-bold uppercase tracking-[2px] text-main">Identity Core</h3>
                         
-                        <div className="flex flex-col items-center gap-4 p-6 glass-card rounded-2xl border-white/5">
+                        <div className="flex flex-col items-center gap-4 p-6 glass-card rounded-2xl border-border">
                            <div className="relative group">
-                              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-crimson to-red-900 border-2 border-white/10 flex items-center justify-center text-3xl font-bold shadow-2xl">
+                              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-crimson to-red-900 border-2 border-border flex items-center justify-center text-3xl font-bold shadow-2xl">
                                 {initials}
                               </div>
-                              <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-brand-deep border border-white/10 flex items-center justify-center hover:bg-brand-crimson transition-colors shadow-lg">
+                              <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-brand-deep border border-border flex items-center justify-center hover:bg-brand-crimson transition-colors shadow-lg">
                                 <Globe size={14} />
                               </button>
                            </div>
@@ -138,25 +138,25 @@ const SettingsPanel = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="space-y-4">
-                           <div className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl group hover:border-[#00F2FF]/20 transition-all">
+                           <div className="flex items-center justify-between p-4 bg-main/5 border border-border rounded-2xl group hover:border-[#00F2FF]/20 transition-all">
                                <div>
                                   <p className="text-sm font-bold">Dark Mode Matrix</p>
                                   <p className="text-[10px] text-brand-muted uppercase tracking-widest font-medium">Toggle system aesthetic</p>
                                </div>
                                <div 
                                  onClick={toggleTheme}
-                                 className={`w-10 h-5 rounded-full relative cursor-pointer transition-all ${theme === 'dark' ? "bg-brand-crimson" : "bg-white/10"}`}
+                                 className={`w-10 h-5 rounded-full relative cursor-pointer transition-all ${theme === 'dark' ? "bg-brand-crimson" : "bg-main/10"}`}
                                >
                                   <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${theme === 'dark' ? "right-1" : "left-1"}`} />
                                </div>
                             </div>
                             <div className="group">
                                <label className="text-[10px] font-bold text-brand-muted uppercase tracking-widest block mb-2 px-1">Display Name</label>
-                               <input type="text" defaultValue={userName} className="w-full bg-white/5 border border-white/5 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-crimson/30 transition-all font-medium" />
+                               <input type="text" defaultValue={userName} className="w-full bg-main/5 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-crimson/30 transition-all font-medium" />
                             </div>
                             <div className="group">
                                <label className="text-[10px] font-bold text-brand-muted uppercase tracking-widest block mb-2 px-1">Access Channel</label>
-                               <input type="text" defaultValue={userEmail} className="w-full bg-white/5 border border-white/5 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-crimson/30 transition-all font-medium" />
+                               <input type="text" defaultValue={userEmail} className="w-full bg-main/5 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-brand-crimson/30 transition-all font-medium" />
                             </div>
                          </div>
                        </div>
@@ -164,17 +164,17 @@ const SettingsPanel = ({ isOpen, onClose }) => {
 
                     {activeTab === "system" && (
                        <div className="space-y-6">
-                          <h3 className="text-sm font-bold uppercase tracking-[2px] text-white">Interface Protocol</h3>
+                          <h3 className="text-sm font-bold uppercase tracking-[2px] text-main">Interface Protocol</h3>
                           
                           <div className="space-y-3">
                              {options.filter(o => o.id !== 'darkMode').map((opt, i) => (
-                               <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+                               <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] border border-border rounded-2xl">
                                   <div>
                                      <p className="text-sm font-bold">{opt.label}</p>
                                      <p className="text-[10px] text-brand-muted uppercase tracking-tighter">{opt.desc}</p>
                                   </div>
                                   <div 
-                                    className={`w-10 h-5 rounded-full relative cursor-pointer transition-all ${opt.active ? "bg-brand-crimson" : "bg-white/10"}`}
+                                    className={`w-10 h-5 rounded-full relative cursor-pointer transition-all ${opt.active ? "bg-brand-crimson" : "bg-main/10"}`}
                                   >
                                      <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${opt.active ? "right-1" : "left-1"}`} />
                                   </div>
@@ -198,7 +198,7 @@ const SettingsPanel = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            <div className="p-8 border-t border-white/5 bg-white/[0.02] flex items-center justify-between">
+            <div className="p-8 border-t border-border bg-white/[0.02] flex items-center justify-between">
               <button className="flex items-center gap-2 text-brand-muted hover:text-brand-crim transition-colors group">
                  <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
                  <span className="text-[10px] font-bold uppercase tracking-widest">Disconnect Terminal</span>

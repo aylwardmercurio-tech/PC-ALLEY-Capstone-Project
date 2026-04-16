@@ -57,8 +57,8 @@ const getInventory = async (req, res) => {
     let { branch_id } = req.query;
     let where = {};
 
-    // Logic: Managers only see their branch. Admins see everything unless filtered.
-    if (req.user.role === 'branch_admin') {
+    // Logic: Branch managers and employees only see their assigned sector. Super Admins see everything unless filtered.
+    if (req.user.role === 'branch_admin' || req.user.role === 'employee') {
       where.branch_id = req.user.branch_id;
     } else if (branch_id) {
       where.branch_id = branch_id;

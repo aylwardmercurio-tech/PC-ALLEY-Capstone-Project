@@ -4,14 +4,16 @@ const { Branch, User, Category } = require('./models');
 
 const seed = async () => {
   try {
-    await sequelize.sync({ force: true }); // Careful: wipes db for fresh start
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    await sequelize.sync({ force: true });
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
     console.log('Database sync complete (FORCE).');
 
     // Create Branches
     const branches = await Branch.bulkCreate([
-      { name: 'Branch A', location: 'Main Street, Manila', phone: '0917-123-4567' },
-      { name: 'Branch B', location: 'Commercial Area, Cebu', phone: '0917-234-5678' },
-      { name: 'Branch C', location: 'Downtown, Davao', phone: '0917-345-6789' }
+      { name: 'Sta Rosa', location: 'Sta Rosa, Laguna', phone: '049-123-4567' },
+      { name: 'Calamba', location: 'Calamba, Laguna', phone: '049-234-5678' },
+      { name: 'Sta Cruz', location: 'Sta Cruz, Laguna', phone: '049-345-6789' }
     ]);
     console.log('Branches created.');
 
@@ -23,19 +25,37 @@ const seed = async () => {
       role: 'super_admin'
     });
     
-    // Create Branch Admin for Branch A
+    // Create Branch Admins for each branch
     const hashedBranchPassword = await bcrypt.hash('branch123', 10);
+    
+    // Sta Rosa Admin
     await User.create({
-      username: 'branch_a@pcalley.com',
+      username: 'starosa_admin@pcalley.com',
       password: hashedBranchPassword,
       role: 'branch_admin',
       branch_id: branches[0].id
     });
 
-    // Create Staff/Employee for Branch A
+    // Calamba Admin
+    await User.create({
+      username: 'calamba_admin@pcalley.com',
+      password: hashedBranchPassword,
+      role: 'branch_admin',
+      branch_id: branches[1].id
+    });
+
+    // Sta Cruz Admin
+    await User.create({
+      username: 'stacruz_admin@pcalley.com',
+      password: hashedBranchPassword,
+      role: 'branch_admin',
+      branch_id: branches[2].id
+    });
+
+    // Create a staff member for Sta Rosa as an example
     const hashedStaffPassword = await bcrypt.hash('staff123', 10);
     await User.create({
-      username: 'staff_a@pcalley.com',
+      username: 'starosa_staff@pcalley.com',
       password: hashedStaffPassword,
       role: 'employee',
       branch_id: branches[0].id

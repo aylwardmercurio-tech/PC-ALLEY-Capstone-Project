@@ -4,7 +4,8 @@ const { User, Branch } = require('../models');
 
 const register = async (req, res) => {
   try {
-    const { username, password, role, branch_id } = req.body;
+    const { password, role, branch_id } = req.body;
+    const username = String(req.body.username || '').trim().toLowerCase();
     
     // Enforcement: Branch Managers can only create employees for their branch
     if (req.user.role === 'branch_admin') {
@@ -21,7 +22,7 @@ const register = async (req, res) => {
       username,
       password: hashedPassword,
       role,
-      branch_id
+      branch_id: branch_id === '' ? null : branch_id
     });
     res.status(201).json({ message: 'User provisioned successfully', userId: user.id });
   } catch (error) {
@@ -31,7 +32,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { password } = req.body;
+    const username = String(req.body.username || '').trim().toLowerCase();
     const user = await User.findOne({ 
       where: { username },
       include: [Branch]

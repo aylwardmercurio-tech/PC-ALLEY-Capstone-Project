@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Bell, Settings as SettingsIcon, Calendar, Command, User, ChevronDown, LogOut, Sun, Moon } from "lucide-react";
+import { Search, Bell, Settings as SettingsIcon, Calendar, Command, User, ChevronDown, LogOut, Sun, Moon, Menu } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import NotificationsPanel from "./NotificationsPanel";
 import Breadcrumb from "./Breadcrumb";
 import { useTheme } from "../context/ThemeContext";
+import { useLayout } from "../context/LayoutContext";
 
  const TopBar = ({ title }) => {
    const { theme, toggleTheme } = useTheme();
+   const { isMobile, isSidebarOpen, setIsSidebarOpen } = useLayout();
    const router = useRouter();
    const [user, setUser] = useState(null);
    const [dateStr, setDateStr] = useState("");
@@ -19,7 +21,7 @@ import { useTheme } from "../context/ThemeContext";
    const handleLogout = () => {
      localStorage.removeItem("token");
      localStorage.removeItem("user");
-     router.push("/login");
+     router.push("/");
    };
  
    const getInitials = (name) => {
@@ -43,28 +45,42 @@ import { useTheme } from "../context/ThemeContext";
   }, []);
 
   return (
-    <header className="h-20 flex items-center justify-between px-8 bg-brand-navy/80 backdrop-blur-xl border-b border-border sticky top-0 z-40 transition-colors duration-300">
-      {/* Left: Breadcrumbs / Title */}
-      <Breadcrumb defaultTitle={title} />
+    <header className="h-20 flex items-center justify-between px-4 md:px-8 bg-brand-navy/80 backdrop-blur-xl border-b border-border sticky top-0 z-40 transition-colors duration-300">
+      <div className="flex items-center gap-4">
+        {/* Mobile Menu Toggle */}
+        {isMobile && (
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="w-10 h-10 rounded-xl bg-brand-surface border border-border flex items-center justify-center text-main hover:bg-brand-crimson/10 transition-all duration-300 active:scale-95"
+          >
+            <Menu size={20} />
+          </button>
+        )}
+        
+        {/* Breadcrumbs / Title - Shorter on mobile */}
+        <div className={isMobile ? "max-w-[150px] truncate" : ""}>
+          <Breadcrumb defaultTitle={title} />
+        </div>
+      </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-8">
-        {/* Search Bar */}
-        <div className="relative group hidden md:block">
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-brand-neonblue transition-all">
+      <div className="flex items-center gap-2 md:gap-8">
+        {/* Search Bar - Hidden on small mobile, shown on md+ */}
+        <div className="relative group hidden lg:block">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-brand-neonblue transition-all duration-300">
             <Search size={16} />
           </div>
           <input
             type="text"
             placeholder="Search System Core..."
-            className="w-80 bg-brand-surface/50 border border-border rounded-xl py-2.5 pl-5 pr-12 text-[12px] text-main placeholder:text-muted/40 focus:outline-none focus:border-brand-neonblue/30 focus:ring-1 focus:ring-brand-neonblue/10 transition-all font-bold tracking-tight"
+            className="w-64 xl:w-80 bg-brand-surface/50 border border-border rounded-xl py-2.5 pl-5 pr-12 text-[12px] text-main placeholder:text-muted/40 focus:outline-none focus:border-brand-neonblue/30 focus:ring-1 focus:ring-brand-neonblue/10 transition-all duration-300 font-bold tracking-tight"
           />
         </div>
 
         {/* Theme Quick Toggle */}
         <button 
           onClick={toggleTheme}
-          className="w-10 h-10 rounded-xl bg-brand-surface border border-border hover:border-brand-neonblue/30 flex items-center justify-center transition-all group relative overflow-hidden shadow-sm"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-brand-surface border border-border hover:border-brand-neonblue/30 flex items-center justify-center transition-all duration-300 group relative overflow-hidden shadow-sm"
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
         >
           <AnimatePresence mode="wait">
@@ -81,27 +97,27 @@ import { useTheme } from "../context/ThemeContext";
         </button>
 
         {/* Global Notifications */}
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-px bg-border mx-2 hidden md:block" />
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
           
           <button 
             onClick={() => setIsNotificationsOpen(true)}
-            className="w-10 h-10 rounded-xl bg-brand-surface border border-border hover:border-brand-crimson/30 flex items-center justify-center relative transition-all group"
+            className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-brand-surface border border-border hover:border-brand-crimson/30 flex items-center justify-center relative transition-all duration-300 group"
           >
             <Bell size={18} className="text-muted group-hover:text-main" />
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-brand-crimson rounded-full border-2 border-brand-bgbase shadow-[0_0_8px_rgba(215,38,56,0.5)]" />
+            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 md:w-2 md:h-2 bg-brand-crimson rounded-full border-2 border-brand-bgbase shadow-[0_0_8px_rgba(215,38,56,0.5)]" />
           </button>
 
           {/* Profile Dropdown */}
           <div className="relative">
             <button 
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-3 pl-3 pr-2 py-1.5 bg-brand-surface border border-border rounded-xl hover:bg-brand-muted/5 transition-all group shadow-sm"
+              className="flex items-center gap-2 md:gap-3 pl-2 md:pl-3 pr-2 py-1 md:py-1.5 bg-brand-surface border border-border rounded-xl hover:bg-brand-muted/5 transition-all duration-300 group shadow-sm"
             >
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-brand-crimson to-brand-neonpurple flex items-center justify-center text-[10px] font-black text-white shadow-lg">
+              <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-gradient-to-tr from-brand-crimson to-brand-neonpurple flex items-center justify-center text-[9px] md:text-[10px] font-black text-main shadow-lg">
                 {getInitials(user?.name)}
               </div>
-              <ChevronDown size={14} className={`text-muted group-hover:text-main transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={12} className={`text-muted group-hover:text-main transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
             </button>
 
             <AnimatePresence>
@@ -118,14 +134,14 @@ import { useTheme } from "../context/ThemeContext";
                   </div>
                   <button 
                     onClick={() => { setIsProfileOpen(false); router.push("/profile"); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold text-muted hover:text-main hover:bg-brand-muted/5 rounded-xl transition-all group"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold text-muted hover:text-main hover:bg-brand-muted/5 rounded-xl transition-all duration-300 group"
                   >
                     <User size={16} className="text-muted group-hover:text-brand-neonblue" />
                     User Profile
                   </button>
                   <button 
                     onClick={() => { setIsProfileOpen(false); router.push("/settings"); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold text-muted hover:text-main hover:bg-brand-muted/5 rounded-xl transition-all group"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold text-muted hover:text-main hover:bg-brand-muted/5 rounded-xl transition-all duration-300 group"
                   >
                     <SettingsIcon size={16} className="text-muted group-hover:text-brand-neonpurple" />
                     System Settings
@@ -133,7 +149,7 @@ import { useTheme } from "../context/ThemeContext";
                   <div className="h-px bg-border my-2" />
                   <button 
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold text-brand-crimson hover:bg-brand-crimson/10 rounded-xl transition-all"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-bold text-brand-crimson hover:bg-brand-crimson/10 rounded-xl transition-all duration-300"
                   >
                     <LogOut size={16} />
                     System Logout

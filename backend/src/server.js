@@ -2,40 +2,74 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const sequelize = require('./db');
-const models = require('./models'); // Ensure models are loaded and associated
+require('./models');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = (
+  process.env.FRONTEND_URLS ||
+  process.env.FRONTEND_URL ||
+  'http://localhost:3000,http://localhost:3001'
+)
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(cors());
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  }
+}));
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  if (req.method === 'POST') {
+    console.log('Payload:', req.body);
+  }
+  next();
+});
 
-// Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/inventory', require('./routes/inventoryRoutes'));
 app.use('/api/sales', require('./routes/salesRoutes'));
 app.use('/api/branches', require('./routes/branchRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 
-// Basic Route
 app.get('/', (req, res) => {
   res.send('PC Alley API is running...');
 });
 
-// Database Sync and Start Server
-sequelize.sync({ force: false })
+sequelize
+  .sync({ force: false })
   .then(() => {
     console.log('--------------------------------------------------');
-    console.log('✅ DATABASE: Synced successfully.');
-    app.listen(PORT, () => {
-      console.log(`🚀 SERVER: Running on http://localhost:${PORT}`);
+    console.log('DATABASE: Synced successfully.');
+
+    const server = app.listen(PORT, () => {
+      console.log(`SERVER: Running on http://localhost:${PORT}`);
       console.log('--------------------------------------------------');
     });
+
+    server.on('error', (err) => {
+      console.log('--------------------------------------------------');
+      if (err.code === 'EADDRINUSE') {
+        console.log(`SERVER ERROR: Port ${PORT} is already in use.`);
+      } else {
+        console.log('SERVER ERROR: Failed to start the API server.');
+      }
+      console.log('--------------------------------------------------');
+      console.error('Technical Details:', err.message);
+      process.exit(1);
+    });
   })
-  .catch(err => {
+  .catch((err) => {
     console.log('--------------------------------------------------');
-    console.log('❌ DATABASE ERROR: Could not connect to MySQL.');
-    console.log('👉 Tip: Please ensure XAMPP is open and MySQL is STARTED.');
+    console.log('DATABASE ERROR: Could not connect to MySQL.');
+    console.log('Tip: Please ensure XAMPP is open and MySQL is STARTED.');
     console.log('--------------------------------------------------');
     console.error('Technical Details:', err.message);
   });

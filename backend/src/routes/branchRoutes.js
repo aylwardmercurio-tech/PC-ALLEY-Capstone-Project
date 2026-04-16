@@ -3,7 +3,7 @@ const router = express.Router();
 const { Branch } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/authMiddleware');
 
-router.get('/', authenticateToken, authorizeRoles('super_admin'), async (req, res) => {
+router.get('/', authenticateToken, authorizeRoles('super_admin', 'branch_admin', 'employee'), async (req, res) => {
   try {
     const branches = await Branch.findAll();
     res.json(branches);

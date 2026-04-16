@@ -22,17 +22,17 @@ export default function RegisterPage() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md relative z-10"
       >
-        <div className="glass-panel p-10 rounded-[32px] border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative overflow-hidden">
+        <div className="glass-panel p-10 rounded-[32px] border-border shadow-[0_0_50px_rgba(0,0,0,0.8)] relative overflow-hidden">
           {/* Header */}
           <div className="text-center mb-10">
             <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-2 shadow-xl shadow-white/5 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all">
                 <div className="w-full h-full bg-brand-crimson rounded-md" />
               </div>
-              <h1 className="font-rajdhani font-black text-3xl tracking-[2px] text-white">PC AL<span className="text-brand-crimson">LEY</span></h1>
+              <h1 className="font-rajdhani font-black text-3xl tracking-[2px] text-main">PC AL<span className="text-brand-crimson">LEY</span></h1>
             </Link>
-            <h2 className="text-xl font-bold text-white mb-2">Initialize Account</h2>
-            <p className="text-xs text-white/30 uppercase tracking-widest font-bold">Secure Personnel Registration</p>
+            <h2 className="text-xl font-bold text-main mb-2">Initialize Account</h2>
+            <p className="text-xs text-muted uppercase tracking-widest font-bold">Secure Personnel Registration</p>
           </div>
 
           <form className="space-y-6">
@@ -43,37 +43,37 @@ export default function RegisterPage() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="peer w-full bg-transparent border-2 border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white placeholder-transparent focus:outline-none focus:border-brand-neonblue focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all flex backdrop-blur-md"
+                className="peer w-full bg-transparent border-2 border-border rounded-xl py-4 pl-12 pr-4 text-sm text-main placeholder-transparent focus:outline-none focus:border-brand-neonblue focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all flex backdrop-blur-md"
                 placeholder="Full Name"
               />
               <label 
                 htmlFor="name" 
-                className="absolute left-12 -top-2.5 bg-[#080B12] px-1 text-[10px] font-black uppercase tracking-widest text-brand-neonblue transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-[45%] peer-placeholder-shown:text-white/30 peer-placeholder-shown:text-xs peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-brand-neonblue peer-focus:text-[10px] cursor-text"
+                className="absolute left-12 -top-2.5 bg-[#080B12] px-1 text-[10px] font-black uppercase tracking-widest text-brand-neonblue transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-[45%] peer-placeholder-shown:text-muted peer-placeholder-shown:text-xs peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-brand-neonblue peer-focus:text-[10px] cursor-text"
               >
                 Full Name
               </label>
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 peer-focus:text-brand-neonblue transition-colors">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted peer-focus:text-brand-neonblue transition-colors">
                 <User size={18} />
               </div>
             </div>
 
             <div className="relative group">
               <input
-                type="email"
+                type="text"
                 id="email"
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="peer w-full bg-transparent border-2 border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white placeholder-transparent focus:outline-none focus:border-brand-neonpurple focus:shadow-[0_0_15px_rgba(188,19,254,0.2)] transition-all flex backdrop-blur-md"
-                placeholder="Work Email"
+                className="peer w-full bg-transparent border-2 border-border rounded-xl py-4 pl-12 pr-4 text-sm text-main placeholder-transparent focus:outline-none focus:border-brand-neonpurple focus:shadow-[0_0_15px_rgba(188,19,254,0.2)] transition-all flex backdrop-blur-md"
+                placeholder="Work Email or Username"
               />
               <label 
                 htmlFor="email" 
-                className="absolute left-12 -top-2.5 bg-[#080B12] px-1 text-[10px] font-black uppercase tracking-widest text-brand-neonpurple transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-[45%] peer-placeholder-shown:text-white/30 peer-placeholder-shown:text-xs peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-brand-neonpurple peer-focus:text-[10px] cursor-text"
+                className="absolute left-12 -top-2.5 bg-[#080B12] px-1 text-[10px] font-black uppercase tracking-widest text-brand-neonpurple transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-[45%] peer-placeholder-shown:text-muted peer-placeholder-shown:text-xs peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-brand-neonpurple peer-focus:text-[10px] cursor-text"
               >
-                Work Email
+                Work Email or Username
               </label>
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 peer-focus:text-brand-neonpurple transition-colors">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted peer-focus:text-brand-neonpurple transition-colors">
                 <Mail size={18} />
               </div>
             </div>
@@ -85,16 +85,16 @@ export default function RegisterPage() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="peer w-full bg-transparent border-2 border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white placeholder-transparent focus:outline-none focus:border-brand-crimson focus:shadow-[0_0_15px_rgba(215,38,56,0.2)] transition-all flex backdrop-blur-md"
+                className="peer w-full bg-transparent border-2 border-border rounded-xl py-4 pl-12 pr-4 text-sm text-main placeholder-transparent focus:outline-none focus:border-brand-crimson focus:shadow-[0_0_15px_rgba(215,38,56,0.2)] transition-all flex backdrop-blur-md"
                 placeholder="Access Password"
               />
               <label 
                 htmlFor="password" 
-                className="absolute left-12 -top-2.5 bg-[#080B12] px-1 text-[10px] font-black uppercase tracking-widest text-brand-crimson transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-[45%] peer-placeholder-shown:text-white/30 peer-placeholder-shown:text-xs peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-brand-crimson peer-focus:text-[10px] cursor-text"
+                className="absolute left-12 -top-2.5 bg-[#080B12] px-1 text-[10px] font-black uppercase tracking-widest text-brand-crimson transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-[45%] peer-placeholder-shown:text-muted peer-placeholder-shown:text-xs peer-focus:-top-2.5 peer-focus:translate-y-0 peer-focus:text-brand-crimson peer-focus:text-[10px] cursor-text"
               >
                 Access Password
               </label>
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 peer-focus:text-brand-crimson transition-colors">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted peer-focus:text-brand-crimson transition-colors">
                 <Lock size={18} />
               </div>
             </div>
@@ -105,7 +105,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setFormData({ ...formData, role: "employee" })}
                 className={`py-3.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all overflow-hidden relative ${
-                  formData.role === "employee" ? "bg-[#FFD700]/10 border-[#FFD700] text-[#FFD700] shadow-[0_0_20px_rgba(255,215,0,0.2)]" : "bg-transparent border-white/10 text-white/40 hover:text-white hover:border-white/30"
+                  formData.role === "employee" ? "bg-[#FFD700]/10 border-[#FFD700] text-[#FFD700] shadow-[0_0_20px_rgba(255,215,0,0.2)]" : "bg-transparent border-border text-muted hover:text-main hover:border-border"
                 }`}
               >
                 {formData.role === "employee" && (
@@ -119,7 +119,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setFormData({ ...formData, role: "branch_admin" })}
                 className={`py-3.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all overflow-hidden relative ${
-                  formData.role === "branch_admin" ? "bg-brand-crimson/10 border-brand-crimson text-brand-crimson shadow-[0_0_20px_rgba(215,38,56,0.2)]" : "bg-transparent border-white/10 text-white/40 hover:text-white hover:border-white/30"
+                  formData.role === "branch_admin" ? "bg-brand-crimson/10 border-brand-crimson text-brand-crimson shadow-[0_0_20px_rgba(215,38,56,0.2)]" : "bg-transparent border-border text-muted hover:text-main hover:border-border"
                 }`}
               >
                 {formData.role === "branch_admin" && (
@@ -137,36 +137,36 @@ export default function RegisterPage() {
                 id="branch_id"
                 value={formData.branch_id || ""}
                 onChange={handleChange}
-                className="peer w-full bg-[#080B12] border-2 border-white/10 rounded-xl py-4 flex pl-5 pr-4 text-sm text-white focus:outline-none focus:border-brand-neonblue transition-all backdrop-blur-md appearance-none"
+                className="peer w-full bg-[#080B12] border-2 border-border rounded-xl py-4 flex pl-5 pr-4 text-sm text-main focus:outline-none focus:border-brand-neonblue transition-all backdrop-blur-md appearance-none"
               >
                 <option value="" disabled>Select Logical Sector (Branch) ...</option>
                 <option value="1">Sector Alpha (Manila)</option>
                 <option value="2">Sector Beta (Cebu)</option>
                 <option value="3">Sector Zeta (Davao)</option>
               </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none group-focus-within:text-brand-neonblue transition-colors">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none group-focus-within:text-brand-neonblue transition-colors">
                  <Shield size={16} />
               </div>
             </div>
 
-            <button className="w-full py-4.5 bg-brand-crimson hover:bg-red-700 text-white rounded-xl font-black uppercase tracking-[4px] text-xs transition-all shadow-[0_0_20px_rgba(215,38,56,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4">
+            <button className="w-full py-4.5 bg-brand-crimson hover:bg-red-700 text-main rounded-xl font-black uppercase tracking-[4px] text-xs transition-all shadow-[0_0_20px_rgba(215,38,56,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4">
               Register Account <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
 
           {/* Social Links */}
-          <div className="mt-8 pt-8 border-t border-white/5">
+          <div className="mt-8 pt-8 border-t border-border">
             <div className="flex justify-center gap-4">
-              <button className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all hover:-translate-y-1">
-                <Github size={20} className="text-white/60" />
+              <button className="p-3 bg-main/5 border border-border rounded-xl hover:bg-main/10 hover:border-border transition-all hover:-translate-y-1">
+                <Github size={20} className="text-muted" />
               </button>
-              <button className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all hover:-translate-y-1">
-                <Chrome size={20} className="text-white/60" />
+              <button className="p-3 bg-main/5 border border-border rounded-xl hover:bg-main/10 hover:border-border transition-all hover:-translate-y-1">
+                <Chrome size={20} className="text-muted" />
               </button>
             </div>
           </div>
 
-          <p className="text-center mt-8 text-xs text-white/30 font-bold uppercase tracking-wider">
+          <p className="text-center mt-8 text-xs text-muted font-bold uppercase tracking-wider">
             Already Secured? <Link href="/" className="text-brand-crimson hover:text-[#FF3B4E] hover:drop-shadow-[0_0_5px_rgba(215,38,56,0.8)] transition-all ml-1">Sign In Here</Link>
           </p>
         </div>

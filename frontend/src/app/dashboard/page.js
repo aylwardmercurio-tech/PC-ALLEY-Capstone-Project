@@ -5,7 +5,6 @@ import Sidebar from "../../components/Sidebar";
 import TopBar from "../../components/TopBar";
 import { motion } from "framer-motion";
 import {
-  Currency,
   DollarSign
 } from "lucide-react";
 import {
@@ -21,6 +20,7 @@ import {
   Filler
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
+import StatCard from "../../components/StatCard";
 
 ChartJS.register(
   CategoryScale,
@@ -40,7 +40,7 @@ export default function Dashboard() {
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (!userData) {
-      window.location.href = "/login";
+      window.location.href = "/";
     } else {
       setUser(JSON.parse(userData));
     }
@@ -171,58 +171,37 @@ export default function Dashboard() {
       <Sidebar />
 
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        {/* Reusing TopBar for layout consistency, but adjusting it to look more like the mockup globally */}
         <TopBar title="OVERVIEW DASHBOARD" />
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10 custom-scrollbar relative z-10 bg-brand-bgbase">
           
           {/* Top 4 Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-            {/* Card 1: Revenue */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border border-white/5 flex items-center justify-center opacity-20">
-                <DollarSign size={20} />
-              </div>
-              <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Total Revenue</h3>
-              <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">₱284,920</div>
-              <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                <span className="text-green-400 font-bold flex items-center gap-1">▲ 12.4%</span>
-                <span>vs last month</span>
-              </div>
-              {/* Subtle top indicator line */}
-              <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#FF3B4E]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </motion.div>
-
-            {/* Card 2: Orders */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-              <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Total Orders</h3>
-              <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">4,821</div>
-              <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                <span className="text-green-400 font-bold flex items-center gap-1">▲ 8.1%</span>
-                <span>vs last month</span>
-              </div>
-            </motion.div>
-
-            {/* Card 3: Customers */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-              <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Active Customers</h3>
-              <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">1,294</div>
-              <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                <span className="text-muted font-bold flex items-center gap-1">▼ 2.3%</span>
-                <span>vs last month</span>
-              </div>
-            </motion.div>
-
-            {/* Card 4: Stock */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-              <div className="absolute top-0 left-6 right-6 h-0.5 bg-green-500/50" />
-              <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3 mt-1">Stock Items</h3>
-              <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">8,340</div>
-              <div className="flex items-center gap-1.5 text-xs text-brand-muted/70">
-                <span className="text-green-400 font-bold flex items-center gap-1">▲ 3.7%</span>
-                <span>restocked</span>
-              </div>
-            </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <StatCard 
+              title="Total Revenue" 
+              value="₱284,920" 
+              trend="▲ 12.4%" 
+              subtext="vs last month" 
+              icon={DollarSign}
+            />
+            <StatCard 
+              title="Total Orders" 
+              value="4,821" 
+              trend="▲ 8.1%" 
+              subtext="vs last month" 
+            />
+            <StatCard 
+              title="Active Customers" 
+              value="1,294" 
+              trend="▼ 2.3%" 
+              subtext="vs last month" 
+            />
+            <StatCard 
+              title="Stock Items" 
+              value="8,340" 
+              trend="▲ 3.7%" 
+              subtext="restocked" 
+            />
           </div>
 
           {/* Charts Row */}
@@ -231,7 +210,7 @@ export default function Dashboard() {
             <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }} className="col-span-2 bg-brand-surface/80 border-border rounded-2xl p-6 lg:p-8 flex flex-col">
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-1 h-4 bg-white/20 rounded-full" />
+                  <div className="w-1 h-4 bg-main/20 rounded-full" />
                   <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">Monthly Revenue</h3>
                 </div>
                 <button className="px-4 py-1.5 rounded-lg border border-border text-[10px] font-bold tracking-widest uppercase text-muted hover:text-main hover:bg-brand-surface transition-colors">

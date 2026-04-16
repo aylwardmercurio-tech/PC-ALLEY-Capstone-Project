@@ -15,6 +15,8 @@ import {
   Activity,
   ArrowRight
 } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
+import { apiUrl, getApiErrorMessage } from "../../lib/api";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -61,7 +63,7 @@ export default function InventoryPage() {
   const fetchBranches = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:5000/api/branches", {
+      const res = await fetch(apiUrl("/api/branches"), {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -75,7 +77,7 @@ export default function InventoryPage() {
     const token = localStorage.getItem("token");
     setLoading(true);
     try {
-      let url = "http://localhost:5000/api/inventory";
+      let url = apiUrl("/api/inventory");
       if (selectedBranch) url += `?branch_id=${selectedBranch}`;
       
       const res = await fetch(url, {
@@ -94,7 +96,7 @@ export default function InventoryPage() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:5000/api/inventory/stock", {
+      const res = await fetch(apiUrl("/api/inventory/stock"), {
         method: "PATCH",
         headers: { 
           "Content-Type": "application/json",
@@ -110,9 +112,14 @@ export default function InventoryPage() {
 
       if (res.ok) {
         setIsModalOpen(false);
+        toast.success("Sector Pulse Synchronized: Stock levels updated.");
         fetchInventory();
+      } else {
+        const data = await res.json();
+        toast.error(data.errors?.[0]?.quantity || data.message || "Matrix Sync Conflict.");
       }
     } catch (err) {
+      toast.error(getApiErrorMessage(err, "Telemetry Lost: System Core Unreachable."));
       console.error("Pulse Modulation Error:", err);
     }
   };
@@ -128,6 +135,26 @@ export default function InventoryPage() {
     item.Product?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.Product?.sku.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Consolidated Matrix View Logic (Super Admin + All Sectors)
+  const isConsolidated = !selectedBranch && user?.role === 'super_admin';
+  
+  const consolidatedMap = filteredInventory.reduce((acc, item) => {
+    const pid = item.Product?.id;
+    if (!pid) return acc;
+    if (!acc[pid]) {
+      acc[pid] = {
+        ...item,
+        branchStocks: branches.reduce((bAcc, b) => ({ ...bAcc, [b.id]: 0 }), {}),
+        totalStock: 0
+      };
+    }
+    acc[pid].branchStocks[item.branch_id] = item.quantity;
+    acc[pid].totalStock += item.quantity;
+    return acc;
+  }, {});
+
+  const displayData = isConsolidated ? Object.values(consolidatedMap) : filteredInventory;
 
   const stats = {
     totalItems: inventory.reduce((acc, curr) => acc + curr.quantity, 0),
@@ -174,41 +201,59 @@ export default function InventoryPage() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10 custom-scrollbar relative z-10 bg-brand-bgbase text-main">
           
+          {/* Sector Identity Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h2 className="text-[10px] font-black tracking-[4px] uppercase text-muted/60 mb-1">Stock Protocol</h2>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-rajdhani font-black tracking-tight text-main">
+                  {user?.role === 'super_admin' ? (selectedBranch ? branches.find(b => b.id == selectedBranch)?.name : 'GLOBAL') : user?.branch_name}
+                </h1>
+                <div className="px-3 py-1 bg-brand-neonblue/10 border border-brand-neonblue/20 rounded-full">
+                  <span className="text-[9px] font-black text-brand-neonblue uppercase tracking-widest">Active Sector</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           {/* Header Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Total Inventory</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">{stats.totalItems.toLocaleString()}</div>
-               <p className="text-[10px] text-muted/40 uppercase font-bold tracking-widest">Active Units in Core</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-brand-surface/80 border border-border rounded-2xl p-5 md:p-6 relative overflow-hidden group">
+               <h3 className="text-[9px] md:text-[10px] font-black tracking-[2px] uppercase text-muted mb-2 md:mb-3">Total Inventory</h3>
+               <div className="text-2xl md:text-3xl font-rajdhani font-bold text-main tracking-tight mb-1 md:mb-2">{stats.totalItems.toLocaleString()}</div>
+               <p className="text-[9px] md:text-[10px] text-muted/40 uppercase font-bold tracking-widest">Active Units in Core</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-white/40 mb-3 text-brand-crimson">Critical Nodes</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">{stats.criticalNodes}</div>
-               <p className="text-[10px] text-muted/40 uppercase font-bold tracking-widest">Requiring Stock Sync</p>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-brand-surface/80 border border-border rounded-2xl p-5 md:p-6 relative overflow-hidden group">
+               <h3 className="text-[9px] md:text-[10px] font-black tracking-[2px] uppercase text-brand-crimson/60 mb-2 md:mb-3">Critical Nodes</h3>
+               <div className="text-2xl md:text-3xl font-rajdhani font-bold text-main tracking-tight mb-1 md:mb-2">{stats.criticalNodes}</div>
+               <p className="text-[9px] md:text-[10px] text-muted/40 uppercase font-bold tracking-widest">Requiring Stock Sync</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-white/40 mb-3 text-brand-neonpurple">Classifications</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">{stats.categories}</div>
-               <p className="text-[10px] text-muted/40 uppercase font-bold tracking-widest">Active Hardware Sectors</p>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-brand-surface/80 border border-border rounded-2xl p-5 md:p-6 relative overflow-hidden group">
+               <h3 className="text-[9px] md:text-[10px] font-black tracking-[2px] uppercase text-brand-neonpurple/60 mb-2 md:mb-3">Classifications</h3>
+               <div className="text-2xl md:text-3xl font-rajdhani font-bold text-main tracking-tight mb-1 md:mb-2">{stats.categories}</div>
+               <p className="text-[9px] md:text-[10px] text-muted/40 uppercase font-bold tracking-widest">Active Hardware Sectors</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[2px] uppercase text-muted mb-3">Asset Valuation</h3>
-               <div className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">₱{(stats.valuation / 1000000).toFixed(1)}M</div>
-               <p className="text-[10px] text-muted/40 uppercase font-bold tracking-widest">Total Sector Capital</p>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-brand-surface/80 border border-border rounded-2xl p-5 md:p-6 relative overflow-hidden group">
+               <h3 className="text-[9px] md:text-[10px] font-black tracking-[2px] uppercase text-muted mb-2 md:mb-3">Asset Valuation</h3>
+               <div className="text-2xl md:text-3xl font-rajdhani font-bold text-main tracking-tight mb-1 md:mb-2">₱{(stats.valuation / 1000000).toFixed(1)}M</div>
+               <p className="text-[9px] md:text-[10px] text-muted/40 uppercase font-bold tracking-widest">Total Sector Capital</p>
             </motion.div>
           </div>
 
           {/* Admin Controls */}
           {user?.role === 'super_admin' && (
-            <div className="flex gap-4 mb-8">
+            <div className="flex items-center gap-4 mb-8 bg-brand-surface/40 p-2 rounded-2xl border border-border/50 max-w-fit">
+               <div className="px-4 py-2 text-[9px] font-black uppercase tracking-widest text-muted border-r border-border/50">
+                 Filter Sector
+               </div>
                <div className="relative group">
                    <select 
                      value={selectedBranch}
                      onChange={(e) => setSelectedBranch(e.target.value)}
-                     className="appearance-none bg-brand-surface border border-border rounded-xl py-2.5 pl-4 pr-10 text-xs text-main focus:outline-none focus:border-brand-neonblue/30 transition-all font-bold shadow-sm"
+                     className="appearance-none bg-transparent py-2 pl-4 pr-10 text-xs text-main focus:outline-none transition-all font-bold cursor-pointer"
                    >
                      <option value="" className="bg-brand-surface">All Logical Sectors</option>
                      {branches.map(b => (
@@ -276,19 +321,19 @@ export default function InventoryPage() {
 
           {/* Matrix Registry */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-brand-surface/80 border-border rounded-2xl p-6 lg:p-8">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
                <div className="flex items-center gap-3">
                  <div className="w-1 h-4 bg-muted/20 rounded-full" />
                  <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">Branch Registry</h3>
                </div>
-               <div className="relative group max-w-sm flex-1 ml-10">
+               <div className="relative group w-full md:max-w-sm">
                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-brand-neonblue transition-colors" />
                  <input
                    type="text"
                    value={searchQuery}
                    onChange={(e) => setSearchQuery(e.target.value)}
                    placeholder="Query Registry Module..."
-                   className="w-full bg-brand-bgbase border border-border rounded-xl py-2.5 pl-11 pr-4 text-xs text-main focus:outline-none focus:border-brand-neonblue/30 transition-all"
+                   className="w-full bg-brand-bgbase border border-border rounded-xl py-2.5 pl-11 pr-4 text-xs text-main focus:outline-none focus:border-brand-neonblue/30 transition-all font-bold"
                  />
                </div>
             </div>
@@ -304,38 +349,64 @@ export default function InventoryPage() {
                     <tr className="text-[10px] font-black uppercase tracking-widest text-muted border-b border-border">
                       <th className="pb-4 pr-4">Node Hash</th>
                       <th className="pb-4 px-4">Designation</th>
-                      <th className="pb-4 px-4">Sector</th>
+                      {!isConsolidated ? (
+                        <th className="pb-4 px-4">Sector</th>
+                      ) : (
+                        branches.map(b => (
+                          <th key={b.id} className="pb-4 px-4 text-center">{b.name}</th>
+                        ))
+                      )}
                       <th className="pb-4 px-4">Classification</th>
-                      <th className="pb-4 px-4">Pulse (Stock)</th>
+                      <th className="pb-4 px-4">{isConsolidated ? 'Total Pulse' : 'Pulse (Stock)'}</th>
                       <th className="pb-4 pl-4 text-right">Ops</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm">
-                    {filteredInventory.map((item, i) => (
-                      <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                    {displayData.map((item, i) => (
+                      <tr key={i} className="border-b border-main/5 hover:bg-main/[0.02] transition-colors group">
                         <td className="py-4 pr-4 font-mono text-[10px] text-muted-40 group-hover:text-brand-neonblue transition-colors uppercase">{item.Product?.sku}</td>
                         <td className="py-4 px-4">
                           <h4 className="text-[13px] font-bold text-main group-hover:text-brand-neonblue transition-colors capitalize">{item.Product?.name}</h4>
                         </td>
-                        <td className="py-4 px-4 border-l border-white/5">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-muted opacity-50">{item.Branch?.name}</span>
-                        </td>
+                        
+                        {!isConsolidated ? (
+                          <td className="py-4 px-4 border-l border-main/5">
+                             <span className="text-[10px] font-black uppercase tracking-widest text-muted opacity-50">{item.Branch?.name}</span>
+                          </td>
+                        ) : (
+                          branches.map(b => (
+                            <td key={b.id} className="py-4 px-4 text-center border-l border-main/5">
+                               <span className={`text-[11px] font-black ${item.branchStocks[b.id] <= (item.low_stock_threshold || 5) ? 'text-brand-crimson' : 'text-main/60'}`}>
+                                 {item.branchStocks[b.id]}
+                               </span>
+                            </td>
+                          ))
+                        )}
+
                         <td className="py-4 px-4">
                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-border bg-brand-surface text-muted">{item.Product?.Category?.name || 'GENERIC'}</span>
                         </td>
                         <td className="py-4 px-4">
                            <div className="flex items-center gap-2">
-                             <span className={`text-sm font-black ${item.quantity <= item.low_stock_threshold ? 'text-brand-crimson' : 'text-main'}`}>{item.quantity}</span>
-                             {item.quantity <= item.low_stock_threshold && <AlertTriangle size={12} className="text-brand-crimson animate-pulse" />}
+                             <span className={`text-sm font-black ${(isConsolidated ? item.totalStock : item.quantity) <= (item.low_stock_threshold || 5) ? 'text-brand-crimson' : 'text-main'}`}>
+                               {isConsolidated ? item.totalStock : item.quantity}
+                             </span>
+                             {(isConsolidated ? item.totalStock : item.quantity) <= (item.low_stock_threshold || 5) && <AlertTriangle size={12} className="text-brand-crimson animate-pulse" />}
                            </div>
                         </td>
                         <td className="py-4 pl-4 text-right">
-                           <button 
-                             onClick={() => openAdjustModal(item)}
-                             className="px-4 py-1.5 bg-brand-surface border border-border rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-brand-neonblue hover:text-white transition-all shadow-sm"
-                           >
-                             Modulate Pulse
-                           </button>
+                           {!isConsolidated ? (
+                             <button 
+                               onClick={() => openAdjustModal(item)}
+                               className="px-4 py-1.5 bg-brand-surface border border-border rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-brand-neonblue hover:text-brand-bgbase transition-all shadow-sm"
+                             >
+                               Modulate Pulse
+                             </button>
+                           ) : (
+                             <div className="flex justify-end gap-1">
+                               <span className="text-[8px] font-black text-muted/40 uppercase tracking-tighter">Use Branch Filter to Modulate</span>
+                             </div>
+                           )}
                         </td>
                       </tr>
                     ))}
@@ -361,7 +432,7 @@ export default function InventoryPage() {
                <form onSubmit={handleUpdateStock} className="space-y-8">
                   <div className="space-y-4">
                      <div>
-                        <label className="text-[9px] font-black uppercase tracking-[3px] text-white/20 ml-2">New Quantity</label>
+                        <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">New Quantity</label>
                         <div className="flex items-center gap-4 mt-2">
                            <input 
                              type="number" 
@@ -371,8 +442,8 @@ export default function InventoryPage() {
                              className="flex-1 bg-brand-bgbase border border-border rounded-2xl py-4 px-6 text-xl font-rajdhani font-bold text-brand-neonblue focus:outline-none focus:border-brand-neonblue transition-all"
                            />
                            <div className="px-5 py-4 bg-brand-surface border border-border rounded-2xl flex flex-col items-center">
-                              <span className="text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">Current</span>
-                              <span className="text-sm font-black text-white">{editingItem?.quantity}</span>
+                              <span className="text-[8px] font-black text-muted uppercase tracking-widest mb-1">Current</span>
+                              <span className="text-sm font-black text-main">{editingItem?.quantity}</span>
                            </div>
                         </div>
                      </div>
@@ -380,6 +451,7 @@ export default function InventoryPage() {
                         <label className="text-[9px] font-black uppercase tracking-[3px] text-muted ml-2">Critical Threshold</label>
                         <input 
                           type="number" 
+                          min="0"
                           required
                           value={adjustThreshold}
                           onChange={(e) => setAdjustThreshold(e.target.value)}
@@ -396,6 +468,7 @@ export default function InventoryPage() {
           </div>
         )}
       </AnimatePresence>
+      <Toaster position="bottom-right" />
     </div>
   );
 }

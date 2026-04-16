@@ -41,7 +41,7 @@ export default function ProfilePage() {
                </div>
 
                <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
-                 <div className="w-32 h-32 rounded-[40px] bg-gradient-to-tr from-brand-crimson to-brand-neonpurple flex items-center justify-center text-4xl font-black text-white shadow-2xl">
+                 <div className="w-32 h-32 rounded-[40px] bg-gradient-to-tr from-brand-crimson to-brand-neonpurple flex items-center justify-center text-4xl font-black text-main shadow-2xl">
                    {getInitials(user?.name)}
                  </div>
                  
