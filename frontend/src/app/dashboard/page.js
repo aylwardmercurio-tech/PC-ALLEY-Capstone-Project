@@ -23,7 +23,7 @@ import { Line, Doughnut } from 'react-chartjs-2';
 import StatCard from "../../components/StatCard";
 import { useTheme } from "../../context/ThemeContext";
 import { getChartTheme } from "../../lib/chartTheme";
-
+import { apiUrl } from "../../lib/api";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -38,6 +38,7 @@ ChartJS.register(
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
+  const [salesHistory, setSalesHistory] = useState([]);
   const { theme } = useTheme();
   const chartTheme = getChartTheme(theme);
 
@@ -50,12 +51,49 @@ export default function Dashboard() {
     }
   }, []);
 
+  const fetchSalesData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(apiUrl("/api/sales/history"), {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSalesHistory(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+  
+  const revenueByMonth = new Array(12).fill(0);
+  const ordersByMonth = new Array(12).fill(0);
+  let totalRevenue = 0;
+  const categoriesMap = {};
+
+  salesHistory.forEach(order => {
+    const month = new Date(order.createdAt).getMonth();
+    const amount = parseFloat(order.total_amount) || 0;
+    revenueByMonth[month] += amount;
+    ordersByMonth[month] += 1;
+    totalRevenue += amount;
+
+    if (order.OrderItems) {
+       order.OrderItems.forEach(item => {
+          const catName = item.Product?.Category?.name || 'Uncategorized';
+          categoriesMap[catName] = (categoriesMap[catName] || 0) + item.quantity;
+       });
+    }
+  });
+
   const lineChartData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     datasets: [
       {
         label: 'Revenue',
-        data: [190, 230, 200, 250, 220, 280, 270, 310, 280, 320, 300, 290],
+        data: revenueByMonth,
         borderColor: '#FF3B4E', // Red line
         backgroundColor: 'rgba(255, 59, 78, 0.1)',
         borderWidth: 2,
@@ -69,7 +107,7 @@ export default function Dashboard() {
       },
       {
         label: 'Orders',
-        data: [210, 250, 230, 270, 250, 310, 290, 340, 290, 350, 320, 300].map(v => v - 30), // Blue line slightly below
+        data: ordersByMonth,
         borderColor: '#2563C4', // Blue line
         backgroundColor: 'transparent',
         borderWidth: 2,
@@ -103,13 +141,11 @@ export default function Dashboard() {
     },
     scales: {
       y: {
-        min: 180,
-        max: 360,
+        beginAtZero: true,
         ticks: {
-          stepSize: 20,
           color: chartTheme.tickColor,
           font: { size: 10, family: 'DM Sans' },
-          callback: (value) => '₱' + value + 'k'
+          callback: (value) => '₱' + value
         },
         grid: {
           color: chartTheme.gridColor,
@@ -134,12 +170,16 @@ export default function Dashboard() {
     }
   };
 
+  const catNames = Object.keys(categoriesMap);
+  const catData = Object.values(categoriesMap);
+  const catColors = catNames.map((_, i) => ['#2563C4', '#F8F9FB', '#FF3B4E', '#BC13FE', '#00F2FF'][i % 5]);
+
   const doughnutData = {
-    labels: ['Electronics', 'Apparel', 'Other'],
+    labels: catNames.length > 0 ? catNames : ['No Data'],
     datasets: [
       {
-        data: [45, 25, 30],
-        backgroundColor: ['#2563C4', '#F8F9FB', '#FF3B4E'],
+        data: catData.length > 0 ? catData : [1],
+        backgroundColor: catColors.length > 0 ? catColors : ['#334155'],
         borderWidth: 0,
         hoverOffset: 4
       }
@@ -164,11 +204,14 @@ export default function Dashboard() {
     }
   };
 
-  const recentOrders = [
-    { id: "#ORD-9821", customer: "Maria Santos", product: "Laptop Pro X1", amount: "₱1,299", status: "Delivered", date: "Apr 03, 2026" },
-    { id: "#ORD-9820", customer: "Jose Reyes", product: "Wireless Earbuds", amount: "₱89", status: "Processing", date: "Apr 03, 2026" },
-    { id: "#ORD-9819", customer: "Ana Cruz", product: "Office Chair", amount: "₱340", status: "Shipped", date: "Apr 02, 2026" },
-  ];
+  const recentOrdersList = salesHistory.slice(0, 5).map(order => ({
+    id: `#ORD-${order.id}`,
+    customer: order.customer_name,
+    product: order.OrderItems?.[0]?.Product?.name || 'Multiple Items',
+    amount: `₱${parseFloat(order.total_amount).toLocaleString()}`,
+    status: order.status || "Delivered",
+    date: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+  }));
 
   return (
     <div className="flex bg-brand-bgbase min-h-screen text-main font-dmsans transition-colors duration-300">
@@ -183,14 +226,14 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
             <StatCard 
               title="Total Revenue" 
-              value="₱284,920" 
+              value={`₱${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`} 
               trend="▲ 12.4%" 
               subtext="vs last month" 
               icon={DollarSign}
             />
             <StatCard 
               title="Total Orders" 
-              value="4,821" 
+              value={salesHistory.length} 
               trend="▲ 8.1%" 
               subtext="vs last month" 
             />
@@ -253,19 +296,18 @@ export default function Dashboard() {
               </div>
 
               {/* Doughnut Custom Legend */}
-              <div className="flex justify-center items-center gap-4 mt-8">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-brand-bgbase border border-border" />
-                  <span className="text-xs text-muted">Electronics</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#2563C4]" />
-                  <span className="text-xs text-muted">Apparel</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#FF3B4E]" />
-                  <span className="text-xs text-muted">Other</span>
-                </div>
+              <div className="flex justify-center items-center gap-4 mt-8 flex-wrap">
+                {catNames.length > 0 ? catNames.map((name, i) => (
+                  <div key={name} className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: catColors[i] }} />
+                    <span className="text-xs text-muted">{name}</span>
+                  </div>
+                )) : (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#334155]" />
+                    <span className="text-xs text-muted">No Data</span>
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -295,7 +337,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="text-sm">
-                  {recentOrders.map((order, i) => (
+                  {recentOrdersList.map((order, i) => (
                     <tr key={i} className="border-b border-border hover:bg-brand-muted/5 transition-colors">
                       <td className="py-4 pr-4 font-bold text-main">{order.id}</td>
                       <td className="py-4 px-4 text-muted">{order.customer}</td>

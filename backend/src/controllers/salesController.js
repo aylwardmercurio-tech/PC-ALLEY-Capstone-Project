@@ -1,5 +1,5 @@
 const sequelize = require('../db');
-const { Order, OrderItem, Product, Inventory } = require('../models');
+const { Order, OrderItem, Product, Inventory, Category } = require('../models');
 
 const createOrder = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -65,7 +65,13 @@ const getSalesHistory = async (req, res) => {
     
     const orders = await Order.findAll({
       where: whereClause,
-      include: [{ model: OrderItem, include: [Product] }],
+      include: [{ 
+        model: OrderItem, 
+        include: [{
+          model: Product,
+          include: [Category]
+        }] 
+      }],
       order: [['createdAt', 'DESC']]
     });
     res.json(orders);
