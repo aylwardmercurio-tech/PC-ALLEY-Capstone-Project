@@ -35,34 +35,49 @@ const Sidebar = () => {
   const [user, setUser] = useState(null);
   const personnelTitle = user?.role === "super_admin" ? "Personnel Registry" : "Staff Registry";
 
-  const navItems = [
-    { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
-    { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
-    { title: "Contacts", icon: Users, path: "#contacts", group: "SALES", subItems: [
-      { title: "Customers", path: "/customers" },
-      { title: "Customer Groups", path: "#dummy-groups" },
-      { title: "Import Contacts", path: "#dummy-import" }
-    ]},
-    { title: "Products", icon: Package, path: "#products", group: "SALES", subItems: [
-      { title: "List Products", path: "/products" },
-      { title: "Dummy Product Add", path: "#dummy-product-1" }
-    ]},
-    { title: "Purchases", icon: Download, path: "#purchases", group: "SALES", subItems: [
-      { title: "Dummy Purchase 1", path: "#dummy-purchase-1" }
-    ]},
-    { title: "Sell", icon: Upload, path: "#sell", group: "SALES", subItems: [
-      { title: "Dummy Sell 1", path: "#dummy-sell-1" }
-    ]},
-    { title: personnelTitle, icon: UserPlus, path: "/staff", group: "SALES" },
-    { title: "Analytics", icon: BarChart3, path: "/analytics", group: "SYSTEM" },
-    { title: "Reports", icon: ClipboardList, path: "#reports", group: "SYSTEM", subItems: [
-      { title: "Dummy Report 1", path: "#dummy-report-1" }
-    ]},
-    { title: "Notification Templates", icon: Mail, path: "#templates", group: "SYSTEM", subItems: [
-      { title: "Dummy Template 1", path: "#dummy-template-1" }
-    ]},
-    { title: "Admin Panel", icon: ShieldCheck, path: "/admin", group: "SYSTEM" },
-  ];
+  const getNavItems = () => {
+    const isStaff = user?.role === 'employee' || user?.role === 'staff';
+
+    if (isStaff) {
+      return [
+        { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
+        { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
+        { title: "Products", icon: Package, path: "/products", group: "SALES" },
+        { title: "Customers", icon: Users, path: "/customers", group: "SALES" },
+      ];
+    }
+
+    return [
+      { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
+      { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
+      { title: "Contacts", icon: Users, path: "#contacts", group: "SALES", subItems: [
+        { title: "Customers", path: "/customers" },
+        { title: "Customer Groups", path: "#dummy-groups" },
+        { title: "Import Contacts", path: "#dummy-import" }
+      ]},
+      { title: "Products", icon: Package, path: "#products", group: "SALES", subItems: [
+        { title: "List Products", path: "/products" },
+        { title: "Dummy Product Add", path: "#dummy-product-1" }
+      ]},
+      { title: "Purchases", icon: Download, path: "#purchases", group: "SALES", subItems: [
+        { title: "Dummy Purchase 1", path: "#dummy-purchase-1" }
+      ]},
+      { title: "Sell", icon: Upload, path: "#sell", group: "SALES", subItems: [
+        { title: "Dummy Sell 1", path: "#dummy-sell-1" }
+      ]},
+      { title: personnelTitle, icon: UserPlus, path: "/staff", group: "SALES" },
+      { title: "Analytics", icon: BarChart3, path: "/analytics", group: "SYSTEM" },
+      { title: "Reports", icon: ClipboardList, path: "#reports", group: "SYSTEM", subItems: [
+        { title: "Dummy Report 1", path: "#dummy-report-1" }
+      ]},
+      { title: "Notification Templates", icon: Mail, path: "#templates", group: "SYSTEM", subItems: [
+        { title: "Dummy Template 1", path: "#dummy-template-1" }
+      ]},
+      { title: "Admin Panel", icon: ShieldCheck, path: "/admin", group: "SYSTEM" },
+    ];
+  };
+
+  const navItems = getNavItems();
 
   const toggleMenu = (title, e) => {
     if (e) e.preventDefault();
