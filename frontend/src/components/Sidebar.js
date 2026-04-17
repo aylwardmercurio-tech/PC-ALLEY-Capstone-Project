@@ -14,7 +14,12 @@ import {
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Menu,
+  Download,
+  Upload,
+  ClipboardList,
+  Mail,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SettingsPanel from "./SettingsPanel";
@@ -25,6 +30,7 @@ import { useLayout } from "../context/LayoutContext";
 const Sidebar = () => {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [openMenus, setOpenMenus] = useState({});
   const { isCollapsed, setIsCollapsed, isMobile, isSidebarOpen, setIsSidebarOpen } = useLayout();
   const [user, setUser] = useState(null);
   const personnelTitle = user?.role === "super_admin" ? "Personnel Registry" : "Staff Registry";
@@ -32,12 +38,36 @@ const Sidebar = () => {
   const navItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
     { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
-    { title: "Products", icon: ShoppingCart, path: "/products", group: "SALES" },
-    { title: "Customers", icon: Users, path: "/customers", group: "SALES" },
+    { title: "Contacts", icon: Users, path: "#contacts", group: "SALES", subItems: [
+      { title: "Customers", path: "/customers" },
+      { title: "Customer Groups", path: "#dummy-groups" },
+      { title: "Import Contacts", path: "#dummy-import" }
+    ]},
+    { title: "Products", icon: Package, path: "#products", group: "SALES", subItems: [
+      { title: "List Products", path: "/products" },
+      { title: "Dummy Product Add", path: "#dummy-product-1" }
+    ]},
+    { title: "Purchases", icon: Download, path: "#purchases", group: "SALES", subItems: [
+      { title: "Dummy Purchase 1", path: "#dummy-purchase-1" }
+    ]},
+    { title: "Sell", icon: Upload, path: "#sell", group: "SALES", subItems: [
+      { title: "Dummy Sell 1", path: "#dummy-sell-1" }
+    ]},
     { title: personnelTitle, icon: UserPlus, path: "/staff", group: "SALES" },
     { title: "Analytics", icon: BarChart3, path: "/analytics", group: "SYSTEM" },
+    { title: "Reports", icon: ClipboardList, path: "#reports", group: "SYSTEM", subItems: [
+      { title: "Dummy Report 1", path: "#dummy-report-1" }
+    ]},
+    { title: "Notification Templates", icon: Mail, path: "#templates", group: "SYSTEM", subItems: [
+      { title: "Dummy Template 1", path: "#dummy-template-1" }
+    ]},
     { title: "Admin Panel", icon: ShieldCheck, path: "/admin", group: "SYSTEM" },
   ];
+
+  const toggleMenu = (title, e) => {
+    if (e) e.preventDefault();
+    setOpenMenus(prev => ({ ...prev, [title]: !prev[title] }));
+  };
 
   const menuGroups = ["MAIN", "SALES", "SYSTEM"];
 
@@ -159,11 +189,15 @@ const Sidebar = () => {
                 {navItems
                   .filter((item) => item.group === group && isAllowed(item.path))
                   .map((item) => {
-                    const isActive = pathname === item.path;
+                    const isActive = pathname === item.path || (item.subItems && item.subItems.some(sub => sub.path === pathname));
+                    const isExpanded = openMenus[item.title];
+                    const ItemWrapper = item.subItems ? 'button' : Link;
+
                     return (
-                      <div key={item.path} className="relative">
-                        <Link
-                          href={item.path}
+                      <div key={item.title} className="relative">
+                        <ItemWrapper
+                          href={item.subItems ? undefined : item.path}
+                          onClick={item.subItems ? (e) => toggleMenu(item.title, e) : undefined}
                           className={`w-full group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 relative ${
                             isActive
                               ? "bg-brand-surface text-main shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"
@@ -179,9 +213,17 @@ const Sidebar = () => {
                           </div>
                           
                           {(!isCollapsed || isMobile) && (
-                            <span className={`text-[13px] font-bold tracking-tight transition-all duration-300 ${isActive ? "text-main glow-text" : ""}`}>
-                              {item.title}
-                            </span>
+                            <div className="flex flex-1 items-center justify-between">
+                              <span className={`text-[13px] font-bold tracking-tight transition-all duration-300 ${isActive ? "text-main glow-text" : ""}`}>
+                                {item.title}
+                              </span>
+                              {item.subItems && (
+                                <ChevronDown 
+                                  size={14} 
+                                  className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} 
+                                />
+                              )}
+                            </div>
                           )}
 
                           {isActive && !isCollapsed && !isMobile && (
@@ -190,7 +232,32 @@ const Sidebar = () => {
                               className="absolute left-0 w-[2px] h-6 bg-brand-crimson rounded-r-full shadow-[0_0_8px_#D72638]"
                             />
                           )}
-                        </Link>
+                        </ItemWrapper>
+
+                        <AnimatePresence>
+                          {item.subItems && isExpanded && (!isCollapsed || isMobile) && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pl-14 pr-4 py-2 space-y-1">
+                                {item.subItems.map((sub, idx) => (
+                                  <Link
+                                    key={idx}
+                                    href={sub.path}
+                                    className={`block py-2 text-[12px] font-medium transition-colors ${
+                                      pathname === sub.path ? "text-brand-crimson" : "text-muted hover:text-main"
+                                    }`}
+                                  >
+                                    {sub.title}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     );
                   })}
