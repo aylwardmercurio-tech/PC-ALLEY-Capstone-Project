@@ -36,6 +36,8 @@ ChartJS.register(
   Filler
 );
 
+
+
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [salesHistory, setSalesHistory] = useState([]);
@@ -48,6 +50,7 @@ export default function Dashboard() {
       window.location.href = "/";
     } else {
       setUser(JSON.parse(userData));
+      fetchSalesData();
     }
   }, []);
 
