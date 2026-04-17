@@ -142,6 +142,7 @@ export default function InventoryPage() {
 
   // Consolidated Matrix View Logic (Super Admin + All Sectors)
   const isConsolidated = !selectedBranch && user?.role === 'super_admin';
+  const canEditStock = user?.role === 'super_admin' || user?.role === 'branch_admin';
   
   const consolidatedMap = filteredInventory.reduce((acc, item) => {
     const pid = item.Product?.id;
@@ -399,19 +400,30 @@ export default function InventoryPage() {
                            </div>
                         </td>
                         <td className="py-4 pl-4 text-right">
-                           {!isConsolidated ? (
-                             <button 
-                               onClick={() => openAdjustModal(item)}
-                               className="px-4 py-1.5 bg-brand-surface border border-border rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-brand-neonblue hover:text-brand-bgbase transition-all shadow-sm"
-                             >
-                               Modulate Pulse
-                             </button>
-                           ) : (
-                             <div className="flex justify-end gap-1">
-                               <span className="text-[8px] font-black text-muted/40 uppercase tracking-tighter">Use Branch Filter to Modulate</span>
-                             </div>
-                           )}
-                        </td>
+                            {!isConsolidated && canEditStock ? (
+                              <button 
+                                onClick={() => openAdjustModal(item)}
+                                className="px-4 py-1.5 bg-brand-surface border border-border rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-brand-neonblue hover:text-brand-bgbase transition-all shadow-sm"
+                              >
+                                Modulate Pulse
+                              </button>
+                            ) : isConsolidated && canEditStock ? (
+                              <div className="flex flex-col gap-1 items-end">
+                                {branches.map(b => {
+                                  const branchItem = inventory.find(i => i.product_id === item.Product?.id && i.branch_id === b.id);
+                                  return branchItem ? (
+                                    <button
+                                      key={b.id}
+                                      onClick={() => openAdjustModal(branchItem)}
+                                      className="px-3 py-1 bg-brand-surface border border-border rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-brand-neonblue hover:text-brand-bgbase transition-all"
+                                    >
+                                      Edit {b.name}
+                                    </button>
+                                  ) : null;
+                                })}
+                              </div>
+                            ) : null}
+                         </td>
                       </tr>
                     ))}
                   </tbody>
