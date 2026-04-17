@@ -75,10 +75,10 @@ export default function AnalyticsPage() {
               <p className="text-[10px] text-brand-muted/50 font-black tracking-[2px] uppercase mt-1">Personnel Authorization: Level 4</p>
             </div>
             <div className="flex gap-4 w-full md:w-auto">
-              <button className="flex-1 md:flex-none h-11 px-6 bg-brand-surface border border-brand-border rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest hover:bg-brand-hover transition-all text-brand-muted hover:text-brand-title">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="flex-1 md:flex-none h-11 px-6 bg-brand-surface border border-brand-border rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest hover:bg-brand-hover transition-all text-brand-muted hover:text-brand-title">
                 <Calendar size={16} /> Last 30 Cycles
               </button>
-              <button className="flex-1 md:flex-none h-11 px-8 bg-brand-crimson hover:bg-red-700 rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-brand-crimson/20">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="flex-1 md:flex-none h-11 px-8 bg-brand-crimson hover:bg-red-700 rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-brand-crimson/20">
                 <Download size={16} /> Extract Matrix
               </button>
             </div>
@@ -235,7 +235,7 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
-              <button className="w-full mt-6 py-3 bg-brand-surface border border-border rounded-xl text-[10px] font-bold uppercase tracking-[2px] text-muted hover:text-main transition-all">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="w-full mt-6 py-3 bg-brand-surface border border-border rounded-xl text-[10px] font-bold uppercase tracking-[2px] text-muted hover:text-main transition-all">
                 Full Systems Diagnosis
               </button>
             </motion.div>

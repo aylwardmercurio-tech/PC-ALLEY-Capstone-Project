@@ -217,7 +217,7 @@ export default function Dashboard() {
                   <div className="w-1 h-4 bg-main/20 rounded-full" />
                   <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">Monthly Revenue</h3>
                 </div>
-                <button className="px-4 py-1.5 rounded-lg border border-border text-[10px] font-bold tracking-widest uppercase text-muted hover:text-main hover:bg-brand-surface transition-colors">
+                <button onClick={() => alert("System Notice: Module Not Enabled")} className="px-4 py-1.5 rounded-lg border border-border text-[10px] font-bold tracking-widest uppercase text-muted hover:text-main hover:bg-brand-surface transition-colors">
                   Export
                 </button>
               </div>
@@ -277,7 +277,7 @@ export default function Dashboard() {
                 <div className="w-1 h-4 bg-muted/20 rounded-full" />
                 <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-wider">Recent Orders</h3>
               </div>
-              <button className="px-4 py-1.5 rounded-lg border border-border hover:bg-brand-muted/5 text-[10px] font-bold tracking-widest uppercase text-muted hover:text-main transition-colors">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="px-4 py-1.5 rounded-lg border border-border hover:bg-brand-muted/5 text-[10px] font-bold tracking-widest uppercase text-muted hover:text-main transition-colors">
                 View All
               </button>
             </div>

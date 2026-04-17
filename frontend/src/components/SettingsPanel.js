@@ -127,7 +127,7 @@ const SettingsPanel = ({ isOpen, onClose }) => {
                               <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-crimson to-red-900 border-2 border-border flex items-center justify-center text-3xl font-bold shadow-2xl">
                                 {initials}
                               </div>
-                              <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-brand-deep border border-border flex items-center justify-center hover:bg-brand-crimson transition-colors shadow-lg">
+                              <button onClick={() => alert("System Notice: Module Not Enabled")} className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-brand-deep border border-border flex items-center justify-center hover:bg-brand-crimson transition-colors shadow-lg">
                                 <Globe size={14} />
                               </button>
                            </div>
@@ -199,11 +199,11 @@ const SettingsPanel = ({ isOpen, onClose }) => {
 
             {/* Footer */}
             <div className="p-8 border-t border-border bg-white/[0.02] flex items-center justify-between">
-              <button className="flex items-center gap-2 text-brand-muted hover:text-brand-crim transition-colors group">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="flex items-center gap-2 text-brand-muted hover:text-brand-crim transition-colors group">
                  <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
                  <span className="text-[10px] font-bold uppercase tracking-widest">Disconnect Terminal</span>
               </button>
-              <button className="h-12 px-8 bg-brand-crimson hover:bg-red-700 rounded-xl flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-brand-crimson/20 active:scale-[0.98]">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="h-12 px-8 bg-brand-crimson hover:bg-red-700 rounded-xl flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-brand-crimson/20 active:scale-[0.98]">
                 <Save size={16} />
                 Sync Changes
               </button>

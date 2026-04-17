@@ -55,7 +55,7 @@ export default function SettingsPage() {
                    <h2 className="text-3xl font-rajdhani font-bold text-main tracking-tight mb-2">{activeTab.toUpperCase()} ENGINE</h2>
                    <p className="text-[10px] font-bold text-muted uppercase tracking-[4px]">Configuration Matrix v4.0.2</p>
                  </div>
-                 <button className="flex items-center gap-2 px-6 py-3 bg-brand-crimson hover:bg-red-700 rounded-xl text-[10px] font-black uppercase tracking-[2px] text-main transition-all shadow-lg shadow-brand-crimson/20">
+                 <button onClick={() => alert("System Notice: Module Not Enabled")} className="flex items-center gap-2 px-6 py-3 bg-brand-crimson hover:bg-red-700 rounded-xl text-[10px] font-black uppercase tracking-[2px] text-main transition-all shadow-lg shadow-brand-crimson/20">
                    <Save size={16} /> Deploy Config
                  </button>
                </div>
@@ -67,7 +67,7 @@ export default function SettingsPage() {
                        <h4 className="text-[11px] font-black text-muted uppercase tracking-widest mb-6">Visual Core Theme</h4>
                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                          {["Matrix Dark", "Clinical Light", "High Contrast"].map((t, i) => (
-                           <button key={i} className={`p-4 rounded-xl border border-border text-[10px] font-bold transition-all ${i === 0 ? "bg-brand-neonblue/5 border-brand-neonblue/30 text-brand-neonblue" : "hover:bg-brand-surface"}`}>
+                           <button onClick={() => alert("System Notice: Module Not Enabled")} key={i} className={`p-4 rounded-xl border border-border text-[10px] font-bold transition-all ${i === 0 ? "bg-brand-neonblue/5 border-brand-neonblue/30 text-brand-neonblue" : "hover:bg-brand-surface"}`}>
                              {t}
                            </button>
                          ))}

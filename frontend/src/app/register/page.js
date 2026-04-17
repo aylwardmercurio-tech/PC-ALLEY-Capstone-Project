@@ -149,7 +149,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <button className="w-full py-4.5 bg-brand-crimson hover:bg-red-700 text-main rounded-xl font-black uppercase tracking-[4px] text-xs transition-all shadow-[0_0_20px_rgba(215,38,56,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4">
+            <button onClick={() => alert("System Notice: Module Not Enabled")} className="w-full py-4.5 bg-brand-crimson hover:bg-red-700 text-main rounded-xl font-black uppercase tracking-[4px] text-xs transition-all shadow-[0_0_20px_rgba(215,38,56,0.4)] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4">
               Register Account <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
@@ -157,10 +157,10 @@ export default function RegisterPage() {
           {/* Social Links */}
           <div className="mt-8 pt-8 border-t border-border">
             <div className="flex justify-center gap-4">
-              <button className="p-3 bg-main/5 border border-border rounded-xl hover:bg-main/10 hover:border-border transition-all hover:-translate-y-1">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="p-3 bg-main/5 border border-border rounded-xl hover:bg-main/10 hover:border-border transition-all hover:-translate-y-1">
                 <Github size={20} className="text-muted" />
               </button>
-              <button className="p-3 bg-main/5 border border-border rounded-xl hover:bg-main/10 hover:border-border transition-all hover:-translate-y-1">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="p-3 bg-main/5 border border-border rounded-xl hover:bg-main/10 hover:border-border transition-all hover:-translate-y-1">
                 <Chrome size={20} className="text-muted" />
               </button>
             </div>

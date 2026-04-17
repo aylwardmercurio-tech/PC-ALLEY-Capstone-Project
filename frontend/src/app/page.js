@@ -212,7 +212,7 @@ export default function LandingPage() {
                  />
                  <span className="text-[10px] font-black text-muted uppercase tracking-widest group-hover:text-main transition-colors">Show Password</span>
               </label>
-              <button type="button" className="text-[10px] font-black text-brand-crimson uppercase tracking-[2px] hover:text-main hover:underline underline-offset-4 decoration-current transition-all">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} type="button" className="text-[10px] font-black text-brand-crimson uppercase tracking-[2px] hover:text-main hover:underline underline-offset-4 decoration-current transition-all">
                 Forgot Password?
               </button>
             </div>
@@ -240,7 +240,7 @@ export default function LandingPage() {
 
           <div className="mt-16 pt-10 border-t border-border flex flex-col items-center gap-6">
              <div className="flex gap-6">
-                <button className="text-[10px] font-black text-muted uppercase tracking-[2px] hover:text-main hover:underline underline-offset-4 transition-all">Legal Protocol</button>
+                <button onClick={() => alert("System Notice: Module Not Enabled")} className="text-[10px] font-black text-muted uppercase tracking-[2px] hover:text-main hover:underline underline-offset-4 transition-all">Legal Protocol</button>
              </div>
              <p className="text-[9px] text-muted font-black uppercase tracking-[4px]">
                &copy; 2024 PC ALLEY • LOGIC CORE V4.2

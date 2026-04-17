@@ -327,7 +327,7 @@ export default function AdminPage() {
                            {user.Branch ? user.Branch.name : 'Central Core'}
                         </td>
                         <td className="py-4 pl-4 text-right">
-                           <button className="p-2.5 bg-brand-surface border border-border rounded-xl text-muted hover:text-main transition-all shadow-sm"><MoreVertical size={14} /></button>
+                           <button onClick={() => alert("System Notice: Module Not Enabled")} className="p-2.5 bg-brand-surface border border-border rounded-xl text-muted hover:text-main transition-all shadow-sm"><MoreVertical size={14} /></button>
                         </td>
                       </tr>
                     ))}
@@ -375,7 +375,7 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              <button className="w-full mt-6 py-3 bg-brand-surface border border-border rounded-xl text-[10px] font-bold uppercase tracking-[2px] text-muted hover:text-main transition-all shadow-sm">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="w-full mt-6 py-3 bg-brand-surface border border-border rounded-xl text-[10px] font-bold uppercase tracking-[2px] text-muted hover:text-main transition-all shadow-sm">
                 Full System Audit
               </button>
             </motion.div>

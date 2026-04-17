@@ -102,7 +102,7 @@ export default function SalesPage() {
                   className="w-full bg-brand-surface border border-border rounded-2xl py-4 pl-12 pr-4 text-sm text-main focus:outline-none focus:border-brand-neonblue/30 transition-all font-bold tracking-tight shadow-sm"
                 />
               </div>
-              <button className="w-full md:w-auto h-14 px-6 bg-brand-surface border border-border rounded-2xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-muted hover:bg-brand-muted/5 transition-all shadow-sm">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="w-full md:w-auto h-14 px-6 bg-brand-surface border border-border rounded-2xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-muted hover:bg-brand-muted/5 transition-all shadow-sm">
                 <Barcode size={20} /> Bulk Scan
               </button>
             </div>

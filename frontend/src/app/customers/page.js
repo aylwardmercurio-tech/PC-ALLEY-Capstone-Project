@@ -138,7 +138,7 @@ export default function CustomersPage() {
                   <h3 className="text-sm font-rajdhani font-bold uppercase text-main tracking-[2px] flex items-center gap-3">
                     <Globe size={18} className="text-brand-neonpurple" /> Strategic Locations
                   </h3>
-                  <button className="text-[10px] font-bold uppercase tracking-widest text-muted hover:text-main transition-colors">Visual Matrix &gt;</button>
+                  <button onClick={() => alert("System Notice: Module Not Enabled")} className="text-[10px] font-bold uppercase tracking-widest text-muted hover:text-main transition-colors">Visual Matrix &gt;</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                   {locations.map((loc) => (
@@ -254,8 +254,8 @@ export default function CustomersPage() {
                         </td>
                         <td className="py-5 pl-4 text-right">
                           <div className="flex items-center justify-end gap-3">
-                            <button className="p-2 bg-brand-surface border border-border rounded-lg text-muted hover:text-main hover:bg-brand-muted/10 transition-all"><History size={14} /></button>
-                            <button className="p-2 bg-brand-surface border border-border rounded-lg text-muted hover:text-brand-crimson hover:bg-brand-muted/10 transition-all"><MoreVertical size={14} /></button>
+                            <button onClick={() => alert("System Notice: Module Not Enabled")} className="p-2 bg-brand-surface border border-border rounded-lg text-muted hover:text-main hover:bg-brand-muted/10 transition-all"><History size={14} /></button>
+                            <button onClick={() => alert("System Notice: Module Not Enabled")} className="p-2 bg-brand-surface border border-border rounded-lg text-muted hover:text-brand-crimson hover:bg-brand-muted/10 transition-all"><MoreVertical size={14} /></button>
                           </div>
                         </td>
                       </tr>

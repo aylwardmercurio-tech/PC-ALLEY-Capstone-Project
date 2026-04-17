@@ -310,7 +310,7 @@ export default function StaffPage() {
                           </div>
                         </td>
                         <td className="py-4 pl-4 text-right">
-                          <button className="p-2.5 bg-brand-surface border border-border rounded-xl text-muted hover:text-main transition-all shadow-sm">
+                          <button onClick={() => alert("System Notice: Module Not Enabled")} className="p-2.5 bg-brand-surface border border-border rounded-xl text-muted hover:text-main transition-all shadow-sm">
                             <MoreVertical size={14} />
                           </button>
                         </td>

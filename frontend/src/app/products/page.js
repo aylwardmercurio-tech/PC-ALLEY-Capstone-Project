@@ -113,7 +113,7 @@ export default function ProductsPage() {
               />
             </div>
             <div className="flex gap-4">
-              <button className="h-12 px-6 bg-brand-surface border border-border rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-muted hover:text-main transition-all">
+              <button onClick={() => alert("System Notice: Module Not Enabled")} className="h-12 px-6 bg-brand-surface border border-border rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-muted hover:text-main transition-all">
                 <Filter size={16} /> Advanced Filter
               </button>
             </div>
@@ -210,7 +210,7 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Action */}
-                    <button className="w-9 h-9 flex-shrink-0 bg-brand-bgbase border border-border rounded-xl flex items-center justify-center text-muted hover:bg-brand-neonblue hover:text-main hover:border-brand-neonblue transition-all active:scale-95 ml-2">
+                    <button onClick={() => alert("System Notice: Module Not Enabled")} className="w-9 h-9 flex-shrink-0 bg-brand-bgbase border border-border rounded-xl flex items-center justify-center text-muted hover:bg-brand-neonblue hover:text-main hover:border-brand-neonblue transition-all active:scale-95 ml-2">
                       <ChevronRight size={16} />
                     </button>
                   </motion.div>
