@@ -30,7 +30,22 @@ import { useLayout } from "../context/LayoutContext";
 const Sidebar = () => {
   const pathname = usePathname();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [openMenus, setOpenMenus] = useState({});
+  const [openMenus, setOpenMenus] = useState(() => {
+    const initial = {};
+    const paths = {
+      "Contacts": ["/customers", "/customer-groups", "/import-contacts"],
+      "Products": ["/products", "/inventory"],
+      "Purchases": ["/purchases"],
+      "Sell": ["/sell"]
+    };
+    
+    Object.entries(paths).forEach(([key, matches]) => {
+      if (matches.some(p => pathname.startsWith(p))) {
+        initial[key] = true;
+      }
+    });
+    return initial;
+  });
   const { isCollapsed, setIsCollapsed, isMobile, isSidebarOpen, setIsSidebarOpen } = useLayout();
   const [user, setUser] = useState(null);
   const personnelTitle = user?.role === "super_admin" ? "Personnel Registry" : "Staff Registry";
@@ -278,7 +293,7 @@ const Sidebar = () => {
                           )}
                         </ItemWrapper>
 
-                        <AnimatePresence>
+                        <AnimatePresence initial={false}>
                           {item.subItems && isExpanded && (!isCollapsed || isMobile) && (
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
