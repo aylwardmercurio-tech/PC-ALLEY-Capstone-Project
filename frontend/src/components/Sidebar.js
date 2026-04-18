@@ -37,7 +37,8 @@ const Sidebar = () => {
       "Products": ["/products", "/inventory"],
       "Purchases": ["/purchases"],
       "Sell": ["/sell"],
-      "Reports": ["/reports"]
+      "Reports": ["/reports"],
+      "User Management": ["/staff", "/roles"]
     };
     
     Object.entries(paths).forEach(([key, matches]) => {
@@ -95,7 +96,10 @@ const Sidebar = () => {
         { title: "Discounts", path: "/sell/discounts" },
         { title: "Import Sales", path: "/sell/import" }
       ]},
-      { title: personnelTitle, icon: UserPlus, path: "/staff", group: "SALES" },
+      { title: "User Management", icon: UserPlus, path: "#user-management", group: "SALES", subItems: [
+        { title: "Users", path: "/staff" },
+        { title: "Roles", path: "/roles" }
+      ]},
       { title: "Analytics", icon: BarChart3, path: "/analytics", group: "SYSTEM" },
       { title: "Reports", icon: ClipboardList, path: "#reports", group: "SYSTEM", subItems: [
         { title: "Profit / Loss Report", path: "/reports/profit-loss" },
