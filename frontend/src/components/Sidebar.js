@@ -52,8 +52,8 @@ const Sidebar = () => {
       { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
       { title: "Contacts", icon: Users, path: "#contacts", group: "SALES", subItems: [
         { title: "Customers", path: "/customers" },
-        { title: "Customer Groups", path: "#dummy-groups" },
-        { title: "Import Contacts", path: "#dummy-import" }
+        { title: "Customer Groups", path: "/customer-groups" },
+        { title: "Import Contacts", path: "/import-contacts" }
       ]},
       { title: "Products", icon: Package, path: "#products", group: "SALES", subItems: [
         { title: "List Products", path: "/products" },
