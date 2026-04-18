@@ -60,7 +60,10 @@ const Sidebar = () => {
         { title: "Dummy Product Add", path: "#dummy-product-1" }
       ]},
       { title: "Purchases", icon: Download, path: "#purchases", group: "SALES", subItems: [
-        { title: "Dummy Purchase 1", path: "#dummy-purchase-1" }
+        { title: "Purchase Order", path: "/purchases/orders" },
+        { title: "List Purchases", path: "/purchases" },
+        { title: "Add Purchase", path: "/purchases/add" },
+        { title: "List Purchase Return", path: "/purchases/returns" }
       ]},
       { title: "Sell", icon: Upload, path: "#sell", group: "SALES", subItems: [
         { title: "Dummy Sell 1", path: "#dummy-sell-1" }
