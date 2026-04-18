@@ -49,7 +49,6 @@ const Sidebar = () => {
 
     return [
       { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
-      { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
       { title: "Contacts", icon: Users, path: "#contacts", group: "SALES", subItems: [
         { title: "Customers", path: "/customers" },
         { title: "Customer Groups", path: "/customer-groups" },
@@ -57,6 +56,7 @@ const Sidebar = () => {
       ]},
       { title: "Products", icon: Package, path: "#products", group: "SALES", subItems: [
         { title: "List Products", path: "/products" },
+        { title: "Inventory Manager", path: "/inventory" },
         { title: "Dummy Product Add", path: "#dummy-product-1" }
       ]},
       { title: "Purchases", icon: Download, path: "#purchases", group: "SALES", subItems: [
