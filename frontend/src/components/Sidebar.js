@@ -66,7 +66,18 @@ const Sidebar = () => {
         { title: "List Purchase Return", path: "/purchases/returns" }
       ]},
       { title: "Sell", icon: Upload, path: "#sell", group: "SALES", subItems: [
-        { title: "Dummy Sell 1", path: "#dummy-sell-1" }
+        { title: "All sales", path: "/sell/all" },
+        { title: "Add Sale", path: "/sell/add" },
+        { title: "List POS", path: "/sell/pos/list" },
+        { title: "POS", path: "/sell/pos" },
+        { title: "Add Draft", path: "/sell/drafts/add" },
+        { title: "List Drafts", path: "/sell/drafts" },
+        { title: "Add Quotation", path: "/sell/quotations/add" },
+        { title: "List quotations", path: "/sell/quotations" },
+        { title: "List Sell Return", path: "/sell/returns" },
+        { title: "Shipments", path: "/sell/shipments" },
+        { title: "Discounts", path: "/sell/discounts" },
+        { title: "Import Sales", path: "/sell/import" }
       ]},
       { title: personnelTitle, icon: UserPlus, path: "/staff", group: "SALES" },
       { title: "Analytics", icon: BarChart3, path: "/analytics", group: "SYSTEM" },
