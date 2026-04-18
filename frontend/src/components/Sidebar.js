@@ -110,12 +110,27 @@ const Sidebar = () => {
     if (userData) setUser(JSON.parse(userData));
   }, []);
 
-  // Close sidebar on navigation on mobile
+  // Close sidebar on navigation on mobile and auto-expand active menus
   useEffect(() => {
     if (isMobile) {
       setIsSidebarOpen(false);
     }
-  }, [pathname, isMobile, setIsSidebarOpen]);
+    
+    const items = getNavItems();
+    setOpenMenus(prev => {
+      const next = { ...prev };
+      let changed = false;
+      items.forEach(item => {
+        if (item.subItems && item.subItems.some(sub => sub.path === pathname)) {
+          if (!next[item.title]) {
+            next[item.title] = true;
+            changed = true;
+          }
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [pathname, isMobile, setIsSidebarOpen, user]);
 
   const getRoleTheme = (role) => {
     switch (role?.toLowerCase()) {
