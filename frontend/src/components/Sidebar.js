@@ -7,19 +7,21 @@ import {
   Package,
   ShoppingCart,
   Users,
+  Users2,
   UserPlus,
   LogOut,
   LayoutDashboard,
   Settings,
   ShieldCheck,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
   Menu,
   Download,
   Upload,
   ClipboardList,
   Mail,
+  DollarSign,
+  Star,
+  Home,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SettingsPanel from "./SettingsPanel";
@@ -37,6 +39,7 @@ const Sidebar = () => {
       "Products": ["/products", "/inventory"],
       "Purchases": ["/purchases"],
       "Sell": ["/sell"],
+      "Expenses": ["/expenses"],
       "Reports": ["/reports"],
       "User Management": ["/staff", "/roles"]
     };
@@ -57,10 +60,34 @@ const Sidebar = () => {
 
     if (isStaff) {
       return [
-        { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
-        { title: "Inventory", icon: Package, path: "/inventory", group: "MAIN" },
-        { title: "Products", icon: Package, path: "/products", group: "SALES" },
-        { title: "Customers", icon: Users, path: "/customers", group: "SALES" },
+        { title: "Home", icon: Home, path: "/dashboard", group: "MAIN" },
+        { title: "Contacts", icon: Users, path: "#contacts", group: "MAIN", subItems: [
+          { title: "Customers", path: "/customers" },
+          { title: "Customer Groups", path: "/customer-groups" },
+          { title: "Import Contacts", path: "/import-contacts" }
+        ]},
+        { title: "Products", icon: Package, path: "#products", group: "MAIN", subItems: [
+          { title: "List Products", path: "/products" },
+          { title: "Inventory Manager", path: "/inventory" }
+        ]},
+        { title: "Sell", icon: Upload, path: "#sell", group: "MAIN", subItems: [
+          { title: "All Sales", path: "/sell/all" },
+          { title: "Add Sale", path: "/sell/add" },
+          { title: "POS", path: "/sell/pos" },
+          { title: "List Sell Return", path: "/sell/returns" }
+        ]},
+        { title: "Expenses", icon: DollarSign, path: "#expenses", group: "MAIN", subItems: [
+          { title: "List Expenses", path: "/expenses" },
+          { title: "Add Expense", path: "/expenses/add" },
+          { title: "Expense Categories", path: "/expenses/categories" }
+        ]},
+        { title: "Reports", icon: ClipboardList, path: "#reports", group: "MAIN", subItems: [
+          { title: "Profit / Loss Report", path: "/reports/profit-loss" },
+          { title: "Purchase & Sale", path: "/reports/purchase-sale" },
+          { title: "Stock Report", path: "/reports/stock" },
+        ]},
+        { title: "HRM", icon: Users2, path: "/hrm", group: "MAIN" },
+        { title: "Essentials", icon: Star, path: "/essentials", group: "MAIN" },
       ];
     }
 
@@ -73,8 +100,18 @@ const Sidebar = () => {
       ]},
       { title: "Products", icon: Package, path: "#products", group: "SALES", subItems: [
         { title: "List Products", path: "/products" },
-        { title: "Inventory Manager", path: "/inventory" },
-        { title: "Dummy Product Add", path: "#dummy-product-1" }
+        { title: "Add Product", path: "/products/add" },
+        { title: "Update Price", path: "/products/update-price" },
+        { title: "Print Labels", path: "/products/print-labels" },
+        { title: "Variations", path: "/products/variations" },
+        { title: "Import Products", path: "/products/import" },
+        { title: "Import Opening Stock", path: "/products/import-opening-stock" },
+        { title: "Selling Price Group", path: "/products/selling-price-group" },
+        { title: "Units", path: "/products/units" },
+        { title: "Categories", path: "/products/categories" },
+        { title: "Brands", path: "/products/brands" },
+        { title: "Warranties", path: "/products/warranties" },
+        { title: "Inventory Manager", path: "/inventory" }
       ]},
       { title: "Purchases", icon: Download, path: "#purchases", group: "SALES", subItems: [
         { title: "Purchase Order", path: "/purchases/orders" },
@@ -214,124 +251,141 @@ const Sidebar = () => {
           x: isMobile ? (isSidebarOpen ? 0 : -280) : 0 
         }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className={`fixed left-0 top-0 h-screen bg-brand-navy/80 backdrop-blur-2xl border-r border-border flex flex-col z-50 overflow-hidden shadow-[4px_0_24px_rgba(0,0,0,0.5)] transition-colors duration-300`}
+        className={`fixed left-0 top-0 h-screen bg-brand-navy backdrop-blur-2xl border-r border-border flex flex-col z-50 overflow-hidden shadow-[4px_0_24px_rgba(0,0,0,0.5)] transition-colors duration-300`}
       >
-        {/* Toggle Button - Desktop Only */}
-        {!isMobile && (
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute right-4 top-8 w-8 h-8 rounded-lg bg-main/5 border border-border flex items-center justify-center hover:bg-brand-crimson hover:border-brand-crimson transition-all duration-300 group z-10"
-          >
-            {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </button>
-        )}
-
-        {/* Brand Section */}
-        <div className={`p-8 pb-12 transition-all duration-300 ${isCollapsed && !isMobile ? 'px-4 flex justify-center' : ''}`}>
-          <Link href="/dashboard" className="flex items-center gap-3">
+        {/* Brand Header */}
+        <div className="flex items-center border-b border-border shrink-0 px-6 py-5">
+          <Link href="/dashboard" className="flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center p-1.5 shadow-[0_0_20px_rgba(255,255,255,0.1)] shrink-0">
               <div className="w-full h-full bg-brand-crimson rounded-sm" />
             </div>
-            {(!isCollapsed || isMobile) && (
-              <motion.h2 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="font-rajdhani font-black text-2xl tracking-[2px] text-main"
-              >
-                PC AL<span className="text-main">LEY</span>
-              </motion.h2>
-            )}
+            <motion.h2
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="font-rajdhani font-black text-2xl tracking-[2px] text-main"
+            >
+              PC AL<span className="text-main">LEY</span>
+            </motion.h2>
           </Link>
         </div>
 
         {/* Navigation */}
-        <div className="flex-1 px-4 space-y-8 overflow-y-auto custom-scrollbar">
-          {menuGroups.map((group) => (
-            <div key={group} className="space-y-4">
-              {(!isCollapsed || isMobile) && (
-                <h3 className="px-4 text-[9px] uppercase tracking-[4px] text-muted font-black mb-2 opacity-50">
-                  {group}
-                </h3>
-              )}
-              <div className="space-y-1">
-                {navItems
-                  .filter((item) => item.group === group && isAllowed(item.path))
-                  .map((item) => {
-                    const isActive = pathname === item.path || (item.subItems && item.subItems.some(sub => sub.path === pathname));
-                    const isExpanded = openMenus[item.title];
-                    const ItemWrapper = item.subItems ? 'button' : Link;
+        <div className="flex-1 px-4 overflow-y-auto custom-scrollbar">
+          {(isCollapsed && !isMobile) ? (
+            /* COLLAPSED: flat list, no group wrappers, no gaps */
+            <div className="space-y-1 py-2">
+              {navItems.filter(item => isAllowed(item.path)).map((item) => {
+                const isActive = pathname === item.path || (item.subItems && item.subItems.some(sub => sub.path === pathname));
+                const ItemWrapper = item.subItems ? 'button' : Link;
+                return (
+                  <div key={item.title} className="relative">
+                    <ItemWrapper
+                      href={item.subItems ? undefined : item.path}
+                      onClick={item.subItems ? (e) => toggleMenu(item.title, e) : undefined}
+                      className={`w-full group flex items-center justify-center px-2 py-2 rounded-xl transition-all duration-300 relative ${
+                        isActive ? "bg-brand-surface text-main" : "text-muted hover:text-main"
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg transition-all duration-300 ${
+                        isActive
+                          ? 'bg-brand-crimson text-main shadow-[0_0_20px_rgba(215,38,56,0.5)]'
+                          : 'group-hover:bg-brand-surface group-hover:text-brand-neonblue'
+                      }`}>
+                        <item.icon size={18} />
+                      </div>
+                    </ItemWrapper>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* EXPANDED: grouped layout with section labels */
+            <div className="space-y-6 py-2">
+              {menuGroups.map((group) => (
+                <div key={group} className="space-y-1">
+                  <h3 className="px-4 text-[9px] uppercase tracking-[4px] text-muted font-black mb-2 opacity-50">
+                    {group}
+                  </h3>
+                  <div className="space-y-1">
+                    {navItems
+                      .filter((item) => item.group === group && isAllowed(item.path))
+                      .map((item) => {
+                        const isActive = pathname === item.path || (item.subItems && item.subItems.some(sub => sub.path === pathname));
+                        const isExpanded = openMenus[item.title];
+                        const ItemWrapper = item.subItems ? 'button' : Link;
 
-                    return (
-                      <div key={item.title} className="relative">
-                        <ItemWrapper
-                          href={item.subItems ? undefined : item.path}
-                          onClick={item.subItems ? (e) => toggleMenu(item.title, e) : undefined}
-                          className={`w-full group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 relative ${
-                            isActive
-                              ? "bg-brand-surface text-main shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"
-                              : "text-muted hover:text-main"
-                          } ${isCollapsed && !isMobile ? 'justify-center' : ''}`}
-                        >
-                          <div className={`p-2 rounded-lg transition-all duration-300 ${
-                            isActive 
-                              ? 'bg-brand-crimson text-main shadow-[0_0_20px_rgba(215,38,56,0.5)]' 
-                              : 'group-hover:bg-brand-surface group-hover:text-brand-neonblue'
-                          }`}>
-                            <item.icon size={18} />
-                          </div>
-                          
-                          {(!isCollapsed || isMobile) && (
-                            <div className="flex flex-1 items-center justify-between">
-                              <span className={`text-[13px] font-bold tracking-tight transition-all duration-300 ${isActive ? "text-main glow-text" : ""}`}>
-                                {item.title}
-                              </span>
-                              {item.subItems && (
-                                <ChevronDown 
-                                  size={14} 
-                                  className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} 
+                        return (
+                          <div key={item.title} className="relative">
+                            <ItemWrapper
+                              href={item.subItems ? undefined : item.path}
+                              onClick={item.subItems ? (e) => toggleMenu(item.title, e) : undefined}
+                              className={`w-full group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 relative ${
+                                isActive
+                                  ? "bg-brand-surface text-main shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"
+                                  : "text-muted hover:text-main"
+                              }`}
+                            >
+                              <div className={`p-2 rounded-lg transition-all duration-300 ${
+                                isActive
+                                  ? 'bg-brand-crimson text-main shadow-[0_0_20px_rgba(215,38,56,0.5)]'
+                                  : 'group-hover:bg-brand-surface group-hover:text-brand-neonblue'
+                              }`}>
+                                <item.icon size={18} />
+                              </div>
+
+                              <div className="flex flex-1 items-center justify-between">
+                                <span className={`text-[13px] font-bold tracking-tight transition-all duration-300 ${isActive ? "text-main glow-text" : ""}`}>
+                                  {item.title}
+                                </span>
+                                {item.subItems && (
+                                  <ChevronDown
+                                    size={14}
+                                    className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                                  />
+                                )}
+                              </div>
+
+                              {isActive && (
+                                <motion.div
+                                  layoutId="active-indicator"
+                                  className="absolute left-0 w-[2px] h-6 bg-brand-crimson rounded-r-full shadow-[0_0_8px_#D72638]"
                                 />
                               )}
-                            </div>
-                          )}
+                            </ItemWrapper>
 
-                          {isActive && !isCollapsed && !isMobile && (
-                            <motion.div
-                              layoutId="active-indicator"
-                              className="absolute left-0 w-[2px] h-6 bg-brand-crimson rounded-r-full shadow-[0_0_8px_#D72638]"
-                            />
-                          )}
-                        </ItemWrapper>
-
-                        <AnimatePresence initial={false}>
-                          {item.subItems && isExpanded && (!isCollapsed || isMobile) && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pl-14 pr-4 py-2 space-y-1">
-                                {item.subItems.map((sub, idx) => (
-                                  <Link
-                                    key={idx}
-                                    href={sub.path}
-                                    className={`block py-2 text-[12px] font-medium transition-colors ${
-                                      pathname === sub.path ? "text-brand-crimson" : "text-muted hover:text-main"
-                                    }`}
-                                  >
-                                    {sub.title}
-                                  </Link>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    );
-                  })}
-              </div>
+                            <AnimatePresence initial={false}>
+                              {item.subItems && isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="pl-14 pr-4 py-2 space-y-1">
+                                    {item.subItems.map((sub, idx) => (
+                                      <Link
+                                        key={idx}
+                                        href={sub.path}
+                                        className={`block py-2 text-[12px] font-medium transition-colors ${
+                                          pathname === sub.path ? "text-brand-crimson" : "text-muted hover:text-main"
+                                        }`}
+                                      >
+                                        {sub.title}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
 
           {/* Settings Button */}
           <div className="pt-4 border-t border-border">

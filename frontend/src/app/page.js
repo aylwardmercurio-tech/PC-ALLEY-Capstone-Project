@@ -158,10 +158,24 @@ export default function LandingPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md glass-panel p-12 rounded-[56px] border-border relative z-10 shadow-[0_50px_100px_rgba(0,0,0,0.5)]"
         >
-          <div className="mb-12 text-center lg:text-left">
+          <div className="mb-8 text-center lg:text-left">
             <h2 className="text-[11px] uppercase tracking-[6px] text-brand-crimson font-black mb-4">Personnel Clearance</h2>
             <h3 className="text-3xl font-black text-main tracking-tight">System Access</h3>
           </div>
+
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-8 p-4 bg-brand-crimson/10 border border-brand-crimson/30 rounded-2xl text-[13px] font-bold text-brand-crimson text-center flex items-center justify-center gap-3"
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-brand-crimson animate-pulse" />
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={handleLogin} className="space-y-8">
             <div className="space-y-5">
@@ -231,7 +245,7 @@ export default function LandingPage() {
                 </div>
               ) : (
                 <>
-                  <span className="tracking-[4px] text-xs">INITIALIZE ACCESS</span>
+                  <span className="tracking-[4px] text-xs">LOGIN</span>
                   <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                 </>
               )}
