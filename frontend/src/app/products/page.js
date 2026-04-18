@@ -26,6 +26,12 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  
+  // Advanced Filter States
+  const [showFilters, setShowFilters] = useState(false);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [sortBy, setSortBy] = useState("name-asc");
 
   useEffect(() => {
     fetchProducts();
@@ -48,11 +54,24 @@ export default function ProductsPage() {
 
   const categories = ["All", ...new Set(products.map(p => p.Category?.name).filter(Boolean))];
 
-  const filteredProducts = products.filter(p => {
+  let filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           p.sku.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "All" || p.Category?.name === activeCategory;
-    return matchesSearch && matchesCategory;
+    
+    // Price Range Filter
+    const price = Number(p.price);
+    const matchesMinPrice = minPrice === "" || price >= Number(minPrice);
+    const matchesMaxPrice = maxPrice === "" || price <= Number(maxPrice);
+    
+    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
+  });
+
+  // Sorting
+  filteredProducts.sort((a, b) => {
+    if (sortBy === "price-asc") return Number(a.price) - Number(b.price);
+    if (sortBy === "price-desc") return Number(b.price) - Number(a.price);
+    return a.name.localeCompare(b.name);
   });
 
   // Group products by category
@@ -113,11 +132,78 @@ export default function ProductsPage() {
               />
             </div>
             <div className="flex gap-4">
-              <button onClick={() => alert("System Notice: Module Not Enabled")} className="h-12 px-6 bg-brand-surface border border-border rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] text-muted hover:text-main transition-all">
+              <button 
+                onClick={() => setShowFilters(!showFilters)} 
+                className={`h-12 px-6 border rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] transition-all ${
+                  showFilters 
+                  ? 'bg-brand-neonblue/10 border-brand-neonblue/50 text-brand-neonblue shadow-[0_0_15px_rgba(0,119,204,0.1)]' 
+                  : 'bg-brand-surface border-border text-muted hover:text-main'
+                }`}
+              >
                 <Filter size={16} /> Advanced Filter
               </button>
             </div>
           </div>
+
+          {/* Advanced Filters Panel */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mb-8"
+              >
+                <div className="bg-brand-surface border border-border rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-6">
+                  {/* Sort */}
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-black uppercase tracking-[2px] text-muted mb-2">Sort By</label>
+                    <select 
+                      value={sortBy} 
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full bg-brand-bgbase border border-border rounded-xl py-3 px-4 text-xs font-bold text-main focus:outline-none focus:border-brand-neonblue/30 transition-colors"
+                    >
+                      <option value="name-asc">Name (A-Z)</option>
+                      <option value="price-asc">Price (Low to High)</option>
+                      <option value="price-desc">Price (High to Low)</option>
+                    </select>
+                  </div>
+
+                  {/* Price Range */}
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-black uppercase tracking-[2px] text-muted mb-2">Price Range (₱)</label>
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="number" 
+                        placeholder="Min" 
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                        className="w-full bg-brand-bgbase border border-border rounded-xl py-3 px-4 text-xs font-bold text-main focus:outline-none focus:border-brand-neonblue/30 transition-colors"
+                      />
+                      <span className="text-muted font-bold">-</span>
+                      <input 
+                        type="number" 
+                        placeholder="Max" 
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(e.target.value)}
+                        className="w-full bg-brand-bgbase border border-border rounded-xl py-3 px-4 text-xs font-bold text-main focus:outline-none focus:border-brand-neonblue/30 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Reset Filters */}
+                  <div className="flex items-end">
+                    <button 
+                      onClick={() => { setMinPrice(""); setMaxPrice(""); setSortBy("name-asc"); }}
+                      className="w-full md:w-auto h-11 px-6 bg-brand-bgbase border border-border rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-[2px] text-muted hover:text-brand-crimson hover:border-brand-crimson/30 transition-all font-bold"
+                    >
+                      Reset Defaults
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Category Tabs */}
           <div className="flex gap-3 mb-10 overflow-x-auto no-scrollbar pb-2">
