@@ -36,7 +36,8 @@ const Sidebar = () => {
       "Contacts": ["/customers", "/customer-groups", "/import-contacts"],
       "Products": ["/products", "/inventory"],
       "Purchases": ["/purchases"],
-      "Sell": ["/sell"]
+      "Sell": ["/sell"],
+      "Reports": ["/reports"]
     };
     
     Object.entries(paths).forEach(([key, matches]) => {
@@ -97,7 +98,11 @@ const Sidebar = () => {
       { title: personnelTitle, icon: UserPlus, path: "/staff", group: "SALES" },
       { title: "Analytics", icon: BarChart3, path: "/analytics", group: "SYSTEM" },
       { title: "Reports", icon: ClipboardList, path: "#reports", group: "SYSTEM", subItems: [
-        { title: "Dummy Report 1", path: "#dummy-report-1" }
+        { title: "Profit / Loss Report", path: "/reports/profit-loss" },
+        { title: "Purchase & Sale", path: "/reports/purchase-sale" },
+        { title: "Tax Report", path: "/reports/tax" },
+        { title: "Stock Report", path: "/reports/stock" },
+        { title: "Trending Products", path: "/reports/trending" }
       ]},
       { title: "Notification Templates", icon: Mail, path: "#templates", group: "SYSTEM", subItems: [
         { title: "Dummy Template 1", path: "#dummy-template-1" }
