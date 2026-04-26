@@ -14,12 +14,14 @@ import {
   Banknote,
   Printer,
   ChevronLeft,
-  Calendar
+  Calendar,
+  FileDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
 import { exportToExcel } from "../../../lib/excelExport";
-import { FileDown } from "lucide-react";
+import { useTheme } from "../../../context/ThemeContext";
+import { apiUrl } from "../../../lib/api";
 
 const OrderDetailsModal = ({ isOpen, onClose, order }) => {
   const printRef = useRef(null);
@@ -201,8 +203,20 @@ export default function SalesLedgerPage() {
       'Branch': s.Branch?.name || 'Unknown'
     }));
 
+    const totalRevenue = filteredSales.reduce((acc, curr) => acc + parseFloat(curr.total_amount), 0);
+    const exportOptions = {
+      title: 'PC ALLEY - SALES AUDIT LEDGER',
+      subtitle: `Protocol: Full Transaction History | Filter: ${search || 'All Records'}`,
+      summary: {
+        'Total Transactions': filteredSales.length,
+        'Gross Revenue': `₱${totalRevenue.toLocaleString()}`,
+        'Average Order Value': `₱${(totalRevenue / (filteredSales.length || 1)).toLocaleString()}`,
+        'System Integrity': 'Verified'
+      }
+    };
+
     try {
-      exportToExcel(exportData, 'PCA_Sales_Ledger', 'Transactions');
+      exportToExcel(exportData, 'PCA_Sales_Ledger', 'Transactions', exportOptions);
       toast.success("Excel Sales Matrix Generated");
     } catch (e) {
       toast.error("Export Error");

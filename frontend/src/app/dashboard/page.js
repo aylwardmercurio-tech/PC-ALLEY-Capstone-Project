@@ -69,7 +69,12 @@ export default function Dashboard() {
     if (!userData) {
       window.location.href = "/";
     } else {
-      setUser(JSON.parse(userData));
+      const parsedUser = JSON.parse(userData);
+      if (parsedUser.role === 'employee' || parsedUser.role === 'staff') {
+        window.location.href = "/products"; // Redirect staff away from dashboard
+        return;
+      }
+      setUser(parsedUser);
       fetchAllData();
     }
   }, []);
@@ -368,13 +373,15 @@ export default function Dashboard() {
                     <p className="text-xs text-brand-crimson/80 font-bold">{criticalItems[0].name} runs out in {criticalItems[0].daysRemaining} days!</p>
                   </div>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn-danger py-1 px-4 text-[10px]"
-                >
-                  Restock Now
-                </motion.button>
+                {(user?.role !== 'employee' && user?.role !== 'staff') && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn-danger py-1 px-4 text-[10px]"
+                  >
+                    Restock Now
+                  </motion.button>
+                )}
               </motion.div>
             )}
 
@@ -583,9 +590,11 @@ export default function Dashboard() {
                                   'bg-green-500/10 text-green-500 border border-green-500/20'}`}>
                               {item.daysRemaining} Days
                             </span>
-                            <Link href="/reports/stock" className="mt-1 px-3 py-1 bg-brand-neonblue/20 text-brand-neonblue hover:bg-brand-neonblue hover:text-white transition-colors rounded text-[8px] font-black uppercase tracking-widest border border-brand-neonblue/30 inline-block text-center cursor-pointer">
-                              Restock Req.
-                            </Link>
+                            {(user?.role !== 'employee' && user?.role !== 'staff') && (
+                              <Link href="/reports/stock" className="mt-1 px-3 py-1 bg-brand-neonblue/20 text-brand-neonblue hover:bg-brand-neonblue hover:text-white transition-colors rounded text-[8px] font-black uppercase tracking-widest border border-brand-neonblue/30 inline-block text-center cursor-pointer">
+                                Restock Req.
+                              </Link>
+                            )}
                           </div>
                         </div>
                       )) : (

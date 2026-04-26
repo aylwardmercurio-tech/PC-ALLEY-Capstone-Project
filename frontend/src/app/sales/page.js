@@ -135,7 +135,7 @@ export default function SalesPage() {
 
       if (res.ok) {
         setSuccess(true);
-        toast.success("Transaction Secrued");
+        toast.success("Sale Successful");
         fetchInventory();
         setTimeout(() => {
           setSuccess(false);
@@ -143,10 +143,10 @@ export default function SalesPage() {
         }, 4000);
       } else {
         const err = await res.json();
-        toast.error(err.message || "Checkout Protocol Failed");
+        toast.error(err.message || "Transaction Failed");
       }
     } catch (err) {
-      toast.error("Network synchronization error");
+      toast.error("Network connection error");
     } finally {
       setProcessing(false);
     }
@@ -170,7 +170,7 @@ export default function SalesPage() {
                 </div>
                 <input
                   type="text"
-                  placeholder="Scan barcode or manual search..."
+                  placeholder="Search for products or scan barcode..."
                   className="w-full bg-brand-surface border border-border rounded-2xl py-4 pl-12 pr-4 text-sm text-main focus:outline-none focus:border-brand-neonblue/30 transition-all font-bold tracking-tight shadow-sm"
                 />
               </div>
@@ -202,7 +202,7 @@ export default function SalesPage() {
                 {loading ? (
                   <div className="col-span-full py-20 flex flex-col items-center opacity-40">
                     <Loader2 className="animate-spin mb-4" size={32} />
-                    <p className="text-[10px] font-black uppercase tracking-[4px]">Syncing Matrix...</p>
+                    <p className="text-[10px] font-black uppercase tracking-[4px]">Loading Products...</p>
                   </div>
                 ) : (
                 <AnimatePresence mode="popLayout">
@@ -241,19 +241,19 @@ export default function SalesPage() {
           </div>
 
           {/* Checkout Side Panel */}
-          <div className="flex-1 bg-brand-surface border border-border rounded-[32px] md:rounded-[40px] flex flex-col relative overflow-hidden shadow-sm min-h-[500px] mb-8 lg:mb-0">
+          <div className="lg:w-[380px] bg-brand-surface border border-border rounded-[32px] md:rounded-[40px] flex flex-col relative overflow-hidden shadow-sm min-h-[500px] mb-8 lg:mb-0 shrink-0">
             {/* Header */}
-            <div className="p-6 md:p-10 border-b border-border">
+            <div className="p-5 md:p-7 border-b border-border">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xl font-rajdhani font-black tracking-[2px] uppercase flex items-center gap-3 text-main">
-                  <ShoppingCart size={20} className="text-brand-neonpurple" /> Cart Summary
+                <h3 className="text-lg font-rajdhani font-black tracking-[1.5px] uppercase flex items-center gap-2.5 text-main">
+                  <ShoppingCart size={18} className="text-brand-neonpurple" /> Order Summary
                 </h3>
-                <span className="px-3 py-1 bg-brand-bgbase border border-border rounded-full text-[10px] font-black text-muted uppercase tracking-widest">{cart.length} ITEMS</span>
+                <span className="px-2.5 py-1 bg-brand-bgbase border border-border rounded-full text-[9px] font-black text-muted uppercase tracking-widest">{cart.length} ITEMS</span>
               </div>
             </div>
 
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-8 space-y-4 custom-scrollbar relative">
+            <div className="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar relative">
               <AnimatePresence>
                 {cart.length > 0 ? (
                   cart.map((item) => (
@@ -262,15 +262,15 @@ export default function SalesPage() {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, scale: 0.9 }}
-                      className="group p-5 bg-main/5 rounded-3xl border border-border relative"
+                      className="group p-4 bg-main/5 rounded-2xl border border-border relative"
                     >
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1 pr-6">
-                          <h4 className="text-[13px] font-bold text-main truncate">{item.name}</h4>
-                          <p className="text-[10px] font-black text-muted/40 uppercase tracking-widest mt-1">{item.sku}</p>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1 pr-5">
+                          <h4 className="text-[12px] font-bold text-main truncate">{item.name}</h4>
+                          <p className="text-[9px] font-black text-muted/40 uppercase tracking-widest mt-1">{item.sku}</p>
                         </div>
                         <button onClick={() => removeFromCart(item.id)} className="text-muted/40 hover:text-brand-crimson transition-colors">
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
 
@@ -287,8 +287,8 @@ export default function SalesPage() {
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-center opacity-40 px-10">
                     <Zap size={64} className="mb-6 stroke-[1px] text-brand-neonpurple" />
-                    <h4 className="text-[12px] font-black uppercase tracking-[4px] text-muted">Waiting for Entry</h4>
-                    <p className="text-[10px] mt-2 font-bold leading-tight text-muted">Initialize transaction by scanning or selecting hardware core components.</p>
+                    <h4 className="text-[12px] font-black uppercase tracking-[4px] text-muted">Your Cart is Empty</h4>
+                    <p className="text-[10px] mt-2 font-bold leading-tight text-muted">Scan a barcode or select a product from the list to start the sale.</p>
                   </div>
                 )}
               </AnimatePresence>
@@ -309,8 +309,8 @@ export default function SalesPage() {
                     >
                       <ShieldCheck size={48} className="text-green-500" />
                     </motion.div>
-                    <h3 className="text-2xl font-rajdhani font-black tracking-[4px] uppercase mb-4 text-main">Auth Secured</h3>
-                    <p className="text-[11px] text-muted font-bold mb-10 leading-relaxed uppercase tracking-widest">Transaction Vector Synchronized to Distributed Core Database</p>
+                    <h3 className="text-2xl font-rajdhani font-black tracking-[4px] uppercase mb-4 text-main">Sale Completed</h3>
+                    <p className="text-[11px] text-muted font-bold mb-10 leading-relaxed uppercase tracking-widest">The transaction has been recorded successfully.</p>
                     <div className="w-full h-1.5 bg-brand-surface rounded-full overflow-hidden">
                       <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 4 }} className="h-full bg-green-500 shadow-[0_0_10px_#22C55E]" />
                     </div>
@@ -320,65 +320,65 @@ export default function SalesPage() {
             </div>
 
             {/* Calculations & Footer */}
-            <div className="p-6 md:p-10 bg-brand-muted/5 border-t border-border space-y-6 md:space-y-8">
+            <div className="p-5 md:p-7 bg-brand-muted/5 border-t border-border space-y-5 md:space-y-6">
               <div className="space-y-3">
                 <div className="flex justify-between text-[10px] md:text-[11px] font-black uppercase tracking-widest text-muted">
-                  <span>Subtotal Matrix</span>
+                  <span>Subtotal</span>
                   <span className="text-main">₱{total.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-[10px] md:text-[11px] font-black uppercase tracking-widest text-muted">
-                  <span>Processing VAT (12%)</span>
+                  <span>Tax (VAT 12%)</span>
                   <span className="text-main">₱{tax.toLocaleString()}</span>
                 </div>
               </div>
 
-              <div className="pt-6 md:pt-8 border-t border-border">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-2 mb-6 md:mb-8">
-                  <span className="text-[10px] font-black text-muted uppercase tracking-[4px]">Total Payable</span>
-                  <span className="text-3xl md:text-4xl font-rajdhani font-black text-main tracking-widest">₱{grandTotal.toLocaleString()}</span>
+              <div className="pt-5 md:pt-6 border-t border-border">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-2 mb-5 md:mb-6">
+                  <span className="text-[9px] font-black text-muted uppercase tracking-[3px]">Total Amount</span>
+                  <span className="text-2xl md:text-3xl font-rajdhani font-black text-main tracking-widest">₱{grandTotal.toLocaleString()}</span>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPaymentMethod("Cash")}
-                      className={`h-12 lg:h-16 flex items-center justify-center gap-3 rounded-full border text-[11px] font-black uppercase tracking-[2px] transition-all ${
+                      className={`h-10 lg:h-12 flex items-center justify-center gap-2 rounded-full border text-[10px] font-black uppercase tracking-[1.5px] transition-all ${
                         paymentMethod === "Cash" ? "bg-brand-neonblue/10 border-brand-neonblue/40 text-brand-neonblue shadow-sm" : "bg-brand-bgbase border-border text-muted hover:text-main"
                       }`}
                     >
-                      <Banknote size={16} /> Fiat
+                      <Banknote size={14} /> Cash
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPaymentMethod("Card")}
-                      className={`h-12 lg:h-16 flex items-center justify-center gap-3 rounded-full border text-[11px] font-black uppercase tracking-[2px] transition-all ${
+                      className={`h-10 lg:h-12 flex items-center justify-center gap-2 rounded-full border text-[10px] font-black uppercase tracking-[1.5px] transition-all ${
                         paymentMethod === "Card" ? "bg-brand-neonpurple/10 border-brand-neonpurple/40 text-brand-neonpurple shadow-sm" : "bg-brand-bgbase border-border text-muted hover:text-main"
                       }`}
                     >
-                      <CreditCard size={16} /> Card
+                      <CreditCard size={14} /> Card
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPaymentMethod("GCash")}
-                      className={`h-12 lg:h-16 flex items-center justify-center gap-3 rounded-full border text-[11px] font-black uppercase tracking-[2px] transition-all ${
+                      className={`h-10 lg:h-12 flex items-center justify-center gap-2 rounded-full border text-[10px] font-black uppercase tracking-[1.5px] transition-all ${
                         paymentMethod === "GCash" ? "bg-blue-500/10 border-blue-500/40 text-blue-500 shadow-sm" : "bg-brand-bgbase border-border text-muted hover:text-main"
                       }`}
                     >
-                      <Zap size={16} /> GCash
+                      <Zap size={14} /> GCash
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPaymentMethod("Bank")}
-                      className={`h-12 lg:h-16 flex items-center justify-center gap-3 rounded-full border text-[11px] font-black uppercase tracking-[2px] transition-all ${
+                      className={`h-10 lg:h-12 flex items-center justify-center gap-2 rounded-full border text-[10px] font-black uppercase tracking-[1.5px] transition-all ${
                         paymentMethod === "Bank" ? "bg-green-500/10 border-green-500/40 text-green-500 shadow-sm" : "bg-brand-bgbase border-border text-muted hover:text-main"
                       }`}
                     >
-                      <Banknote size={16} /> Bank
+                      <Banknote size={14} /> Bank
                     </motion.button>
                   </div>
 
@@ -396,13 +396,13 @@ export default function SalesPage() {
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSubmit}
                     disabled={cart.length === 0 || success}
-                    className={`w-full h-18 rounded-full font-black uppercase tracking-[6px] text-xs flex items-center justify-center gap-4 transition-all ${
+                    className={`w-full h-14 rounded-full font-black uppercase tracking-[4px] text-[10px] flex items-center justify-center gap-3 transition-all ${
                       success 
                       ? "bg-green-500 text-main" 
-                      : "bg-brand-crimson hover:bg-red-700 text-main shadow-[0_20px_40px_rgba(215,38,56,0.2)] active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
+                      : "bg-brand-crimson hover:bg-red-700 text-main shadow-[0_15px_30px_rgba(215,38,56,0.15)] active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
                     }`}
                   >
-                    {success ? <CheckCircle2 size={24} /> : <>Initialize Process <ArrowRight size={20} /></>}
+                    {success ? <CheckCircle2 size={20} /> : <>Complete Sale <ArrowRight size={18} /></>}
                   </motion.button>
                 </div>
               </div>

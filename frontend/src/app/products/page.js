@@ -28,6 +28,12 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) setUser(JSON.parse(userData));
+  }, []);
   
   // Advanced Filter States
   const [showFilters, setShowFilters] = useState(false);
@@ -162,14 +168,16 @@ export default function ProductsPage() {
               />
             </div>
             <div className="flex gap-4">
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => toast.error("Catalog Injection Locked: Authorized Root Personnel Only")}
-                className="btn-premium h-12"
-              >
-                <Package size={16} /> Add Product
-              </motion.button>
+              {(user?.role !== 'employee' && user?.role !== 'staff') && (
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => toast.error("Catalog Injection Locked: Authorized Root Personnel Only")}
+                  className="btn-premium h-12"
+                >
+                  <Package size={16} /> Add Product
+                </motion.button>
+              )}
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -335,13 +343,15 @@ export default function ProductsPage() {
                         <p className="text-[9px] text-main/30 font-black uppercase tracking-[2px] mb-0.5">Price</p>
                         <p className="text-sm font-rajdhani font-black text-brand-crimson">₱{Number(product.price).toLocaleString()}</p>
                       </div>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); handleDeleteProduct(product); }}
-                        className="w-8 h-8 rounded-lg border border-brand-crimson/10 flex items-center justify-center text-brand-crimson/30 hover:text-brand-crimson hover:bg-brand-crimson/10 transition-all opacity-0 group-hover:opacity-100"
-                        title="Delete Product"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      {(user?.role !== 'employee' && user?.role !== 'staff') && (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleDeleteProduct(product); }}
+                          className="w-8 h-8 rounded-lg border border-brand-crimson/10 flex items-center justify-center text-brand-crimson/30 hover:text-brand-crimson hover:bg-brand-crimson/10 transition-all opacity-0 group-hover:opacity-100"
+                          title="Delete Product"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 ))}

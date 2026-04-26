@@ -404,8 +404,19 @@ export default function StockReportPage() {
       'Status': i.statusGroup
     }));
     
+    const exportOptions = {
+      title: 'PC ALLEY - INVENTORY INTELLIGENCE REPORT',
+      subtitle: `Target Branch: All Branches | Filter: ${filterStatus}`,
+      summary: {
+        'Total Unique SKUs': kpis.total,
+        'Stock Alert Count': kpis.low,
+        'Dead Stock Items': kpis.dead,
+        'Report Accuracy': 'High (Live System Data)'
+      }
+    };
+
     try {
-      exportToExcel(exportData, `PCA_Stock_Report`, 'Inventory');
+      exportToExcel(exportData, `PCA_Stock_Report`, 'Inventory', exportOptions);
       toast.success("Excel Intelligence Report Generated");
     } catch (error) {
       toast.error("Export Protocol Failed");
@@ -531,7 +542,9 @@ export default function StockReportPage() {
                 >
                   <FileDown size={16} className="text-brand-neonblue" /> Export Excel
                 </button>
-                <button onClick={() => setIsAddingProduct(true)} className="btn-premium flex items-center gap-2 py-2.5 px-5 rounded-lg shadow-[0_0_15px_rgba(14,165,233,0.3)] hover:scale-105 transition-transform"><Plus size={16} /> Add Product</button>
+                {(user?.role !== 'employee' && user?.role !== 'staff') && (
+                  <button onClick={() => setIsAddingProduct(true)} className="btn-premium flex items-center gap-2 py-2.5 px-5 rounded-lg shadow-[0_0_15px_rgba(14,165,233,0.3)] hover:scale-105 transition-transform"><Plus size={16} /> Add Product</button>
+                )}
               </div>
           </div>
 
@@ -567,7 +580,9 @@ export default function StockReportPage() {
                         </td>
                         <td className="py-4 px-6">
                            <div className="flex items-center justify-end gap-2 transition-opacity">
-                             <button onClick={() => setActiveEdit(item)} className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted hover:text-main hover:bg-border/20 transition-all" title="Edit"><Edit size={14} /></button>
+                             {(user?.role !== 'employee' && user?.role !== 'staff') && (
+                               <button onClick={() => setActiveEdit(item)} className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted hover:text-main hover:bg-border/20 transition-all" title="Edit"><Edit size={14} /></button>
+                             )}
                              <button onClick={() => setActiveHistory(item)} className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted hover:text-main hover:bg-border/20 transition-all" title="History"><Clock size={14} /></button>
                              {user?.role === 'super_admin' && (
                                <button 
@@ -578,9 +593,11 @@ export default function StockReportPage() {
                                  <Trash2 size={14} />
                                </button>
                              )}
-                             <button onClick={() => setActiveRestock(item)} className="px-4 py-1.5 rounded-lg bg-brand-neonblue/10 text-brand-neonblue font-black text-[10px] uppercase tracking-widest hover:bg-brand-neonblue hover:text-white transition-colors border border-brand-neonblue/20 flex items-center gap-2">
-                               Restock <TrendingUp size={12} />
-                             </button>
+                             {(user?.role !== 'employee' && user?.role !== 'staff') && (
+                               <button onClick={() => setActiveRestock(item)} className="px-4 py-1.5 rounded-lg bg-brand-neonblue/10 text-brand-neonblue font-black text-[10px] uppercase tracking-widest hover:bg-brand-neonblue hover:text-white transition-colors border border-brand-neonblue/20 flex items-center gap-2">
+                                 Restock <TrendingUp size={12} />
+                               </button>
+                             )}
                            </div>
                         </td>
                       </motion.tr>

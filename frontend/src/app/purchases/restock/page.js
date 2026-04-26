@@ -33,6 +33,10 @@ export default function ProcurementPage() {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       const user = JSON.parse(userStr);
+      if (user.role === 'employee' || user.role === 'staff') {
+        window.location.href = "/products";
+        return;
+      }
       setCurrentUser(user);
     }
     fetchData();

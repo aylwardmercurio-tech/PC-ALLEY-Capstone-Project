@@ -64,7 +64,7 @@ const Sidebar = () => {
     // 1. STAFF / EMPLOYEE VIEW
     if (role === 'employee' || role === 'staff') {
       return [
-        { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard", group: "MAIN" },
+
         {
           title: "Customers", icon: Users, path: "#contacts", group: "SALES", subItems: [
             { title: "Customer List", path: "/customers" }

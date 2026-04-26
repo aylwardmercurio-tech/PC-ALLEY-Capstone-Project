@@ -71,6 +71,13 @@ export default function RestockRequestModal({ inventoryItem, product: legacyProd
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (user?.role === 'employee' || user?.role === 'staff') {
+      toast.error('Access Denied: Staff members are not authorized to submit restock requests.');
+      onClose();
+      return;
+    }
+
     setLoading(true);
     const token = localStorage.getItem('token');
 
