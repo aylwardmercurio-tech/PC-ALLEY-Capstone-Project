@@ -27,10 +27,10 @@ export const LogoIcon = ({ className = "w-12 h-12" }) => {
 
 export const LogoBrandingV2 = ({ className = "", size = "normal" }) => {
   // Determine sizes based on the 'size' prop
-  const iconSize = size === "large" ? "w-14 h-14" : (size === "small" ? "w-8 h-8" : "w-12 h-12");
-  const mainTextSize = size === "large" ? "text-4xl" : (size === "small" ? "text-xl" : "text-3xl");
-  const subTextSize = size === "large" ? "text-[11px]" : (size === "small" ? "text-[7px]" : "text-[9px]");
-  const gap = size === "large" ? "gap-5" : (size === "small" ? "gap-2" : "gap-4");
+  const iconSize = size === "large" ? "w-12 h-12" : (size === "small" ? "w-7 h-7" : "w-10 h-10");
+  const mainTextSize = size === "large" ? "text-3xl" : (size === "small" ? "text-lg" : "text-2xl");
+  const subTextSize = size === "large" ? "text-[9px]" : (size === "small" ? "text-[6px]" : "text-[8px]");
+  const gap = size === "large" ? "gap-4" : (size === "small" ? "gap-2" : "gap-3");
 
   return (
     <div className={`flex items-center ${gap} ${className}`}>

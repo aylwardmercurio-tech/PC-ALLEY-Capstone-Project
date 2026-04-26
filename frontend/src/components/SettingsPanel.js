@@ -30,9 +30,10 @@ const SettingsPanel = ({ isOpen, onClose }) => {
     if (userData) {
       const parsed = JSON.parse(userData);
       setUser(parsed);
+      const email = parsed.email || (parsed.username && !parsed.username.includes('@') ? `${parsed.username}@pcalley.com` : parsed.username || "");
       setFormData({ 
         name: parsed.name || parsed.username || "", 
-        email: parsed.email || (parsed.username + "@pcalley.com") 
+        email: email 
       });
     }
   }, [isOpen]);
@@ -85,13 +86,16 @@ const SettingsPanel = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-brand-deep border-l border-border shadow-2xl z-[101] flex flex-col font-dm-sans"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-brand-bgbase border-l border-border shadow-2xl z-[101] flex flex-col font-dm-sans"
           >
             {/* Header */}
-            <div className="p-8 border-b border-border flex items-center justify-between bg-white/[0.02]">
+            <div className="p-8 border-b border-border flex items-center justify-between bg-brand-surface">
               <div>
-                <h2 className="text-xl font-rajdhani font-bold tracking-wider uppercase">Settings</h2>
-                <p className="text-[10px] text-brand-muted font-bold tracking-[2px] uppercase mt-1">System ID: PC-AL-001</p>
+                <h2 className="text-2xl font-rajdhani font-black tracking-[3px] uppercase text-main">Settings</h2>
+                <div className="flex items-center gap-2 mt-1">
+                   <div className="w-1 h-1 rounded-full bg-brand-neonblue animate-pulse" />
+                   <p className="text-[10px] text-brand-muted font-black tracking-[2px] uppercase">System ID: PC-AL-001</p>
+                </div>
               </div>
               <motion.button
                 whileHover={{ scale: 1.1, rotate: 90 }}
@@ -142,7 +146,7 @@ const SettingsPanel = ({ isOpen, onClose }) => {
                         
                         <div className="flex flex-col items-center gap-4 p-6 glass-card rounded-2xl border-border">
                            <div className="relative group">
-                              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-brand-crimson to-red-900 border-2 border-border flex items-center justify-center text-3xl font-bold shadow-2xl">
+                              <div className="w-24 h-24 rounded-[32px] bg-brand-crimson flex items-center justify-center text-3xl font-black text-white shadow-[0_20px_40px_rgba(215,38,56,0.3)] border border-white/20">
                                 {initials}
                               </div>
                               <button onClick={handleGlobeClick} className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-brand-deep border border-border flex items-center justify-center hover:bg-brand-crimson transition-colors shadow-lg">
@@ -227,7 +231,7 @@ const SettingsPanel = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            <div className="p-8 border-t border-border bg-white/[0.02] flex items-center justify-between">
+            <div className="p-8 border-t border-border bg-brand-surface flex items-center justify-between">
               <motion.button 
                 whileHover={{ x: -4 }}
                 whileTap={{ scale: 0.95 }}
@@ -239,13 +243,13 @@ const SettingsPanel = ({ isOpen, onClose }) => {
                 className="flex items-center gap-2 text-brand-muted hover:text-brand-crimson transition-colors group"
               >
                  <LogOut size={16} />
-                 <span className="text-[10px] font-bold uppercase tracking-widest">Log Out</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest">Log Out</span>
               </motion.button>
               <motion.button 
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSave} 
-                className="h-12 px-8 bg-brand-crimson hover:bg-red-700 rounded-full flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-brand-crimson/20 active:scale-[0.98] text-white"
+                className="h-12 px-8 bg-brand-crimson hover:bg-brand-crimson/90 text-white rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-[2px] transition-all shadow-[0_10px_20px_rgba(215,38,56,0.2)]"
               >
                 <Save size={16} />
                 Save Changes

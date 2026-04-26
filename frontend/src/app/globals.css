@@ -23,9 +23,9 @@
   --brand-panel-rgb: 110, 162, 179; /* #6EA2B3 */
   
   /* 10% - Accents & Text (Contrast) */
-  --text-main-rgb: 0, 29, 57;     /* #001D39 */
-  --text-title-rgb: 0, 29, 57;     /* #001D39 */
-  --text-muted-rgb: 73, 118, 159;  /* #49769F */
+  --text-main-rgb: 0, 20, 40;     /* Sharper Dark Navy */
+  --text-title-rgb: 0, 15, 30;
+  --text-muted-rgb: 40, 80, 120;  /* Deeper Blue-Gray */
   --brand-border-rgb: 78, 142, 162;  /* #4E8EA2 */
   --brand-neonblue-rgb: 10, 65, 116;   /* #0A4174 */
   --brand-neonpurple-rgb: 78, 142, 162; 
@@ -54,9 +54,9 @@
   --brand-surface-rgb: 10, 65, 116;   /* #0A4174 */
   --brand-panel-rgb: 73, 118, 159;  /* #49769F */
   --accent: 215, 38, 56;             /* Crimson Red (#D72638) - Fixed for visibility */
-  --text-main-rgb: 189, 216, 233; /* #BDD8E9 */
+  --text-main-rgb: 210, 230, 250; /* Brighter Ice Blue */
   --text-title-rgb: 255, 255, 255;
-  --text-muted-rgb: 110, 162, 179; /* #6EA2B3 */
+  --text-muted-rgb: 140, 180, 210; /* Clearer Soft Blue */
   --brand-border-rgb: 78, 142, 162;  /* #4E8EA2 */
   --brand-neonblue-rgb: 123, 189, 232; /* #7BBDE8 */
   --brand-neonpurple-rgb: 110, 162, 179;

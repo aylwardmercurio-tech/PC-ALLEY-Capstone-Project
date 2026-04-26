@@ -15,7 +15,15 @@ const getAllProducts = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const { name, sku, description, category_id, price, image_url } = req.body;
-    const product = await Product.create({ name, sku, description, category_id, price, image_url });
+    const product = await Product.create({ 
+      name, 
+      sku, 
+      description, 
+      category_id, 
+      price, 
+      last_purchase_price: price, // Default cost to selling price if not specified
+      image_url 
+    });
     
     // Automatically initialize inventory for all branches with 0 quantity
     const branches = await Branch.findAll();
@@ -245,6 +253,63 @@ const getProductRestockAnalytics = async (req, res) => {
   }
 };
 
+const adjustStock = async (req, res) => {
+  try {
+    const { product_id, branch_id, quantity, note } = req.body;
+    
+    const inventory = await Inventory.findOne({ where: { product_id, branch_id } });
+    if (!inventory) return res.status(404).json({ message: 'Inventory record not found.' });
+
+    const previous_stock = inventory.quantity;
+    const new_stock = previous_stock + parseInt(quantity);
+    
+    if (new_stock < 0) {
+      return res.status(400).json({ error: 'Adjustment would result in negative stock level.' });
+    }
+
+    inventory.quantity = new_stock;
+    await inventory.save();
+
+    await StockMovement.create({
+      product_id,
+      type: 'ADJUSTMENT',
+      quantity: parseInt(quantity),
+      previous_stock,
+      new_stock,
+      user_id: req.user.id,
+      note: note || 'Manual adjustment'
+    });
+
+    res.json({ message: 'Inventory adjusted successfully', new_stock });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findByPk(id);
+    if (!product) return res.status(404).json({ message: 'Product not found.' });
+
+    // Note: We clear dependencies to avoid foreign key constraints
+    await Inventory.destroy({ where: { product_id: id } });
+    await StockMovement.destroy({ where: { product_id: id } });
+    
+    // Check for sales (OrderItem)
+    const { OrderItem } = require('../models');
+    const hasSales = await OrderItem.findOne({ where: { product_id: id } });
+    if (hasSales) {
+      return res.status(400).json({ error: 'Cannot delete product with existing sales history. Purge sales records first or deactivate the product.' });
+    }
+
+    await product.destroy();
+    res.json({ message: 'Product and associated inventory assets have been purged from the system.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete product: ' + error.message });
+  }
+};
+
 module.exports = { 
   getAllProducts, 
   createProduct, 
@@ -253,5 +318,7 @@ module.exports = {
   getStockHistory, 
   getLowStock,
   getGlobalInventoryStatus,
-  getProductRestockAnalytics
+  getProductRestockAnalytics,
+  adjustStock,
+  deleteProduct
 };

@@ -47,4 +47,25 @@ const createBundle = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, createBundle };
+const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, sku, price, category_id, description } = req.body;
+    
+    const product = await Product.findByPk(id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    if (name) product.name = name;
+    if (sku) product.sku = sku;
+    if (price !== undefined) product.price = price;
+    if (category_id !== undefined) product.category_id = category_id;
+    if (description !== undefined) product.description = description;
+
+    await product.save();
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { getProducts, createBundle, updateProduct };

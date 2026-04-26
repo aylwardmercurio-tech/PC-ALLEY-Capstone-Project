@@ -111,7 +111,7 @@ export default function CustomersPage() {
           {/* Identity Header */}
           <div className="mb-10">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <h1 className="text-4xl font-rajdhani font-black tracking-tight text-main uppercase">
+                <h1 className="text-2xl font-rajdhani font-black tracking-tight text-main uppercase">
                   Customer <span className="text-brand-crimson">Registry</span>
                 </h1>
                 <button onClick={() => setIsModalOpen(true)} className="btn-premium h-12 px-8 flex items-center gap-2">

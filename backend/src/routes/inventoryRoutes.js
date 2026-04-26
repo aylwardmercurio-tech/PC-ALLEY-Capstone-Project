@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
 const validate = require('../middleware/validate');
-const { getAllProducts, createProduct, updateStock, getInventory, getLowStock, getGlobalInventoryStatus, getProductRestockAnalytics, getStockHistory } = require('../controllers/inventoryController');
+const { getAllProducts, createProduct, updateStock, getInventory, getLowStock, getGlobalInventoryStatus, getProductRestockAnalytics, getStockHistory, deleteProduct, adjustStock } = require('../controllers/inventoryController');
 const { authenticateToken, authorizeRoles } = require('../middleware/authMiddleware');
 
 router.get('/products', authenticateToken, getAllProducts);
@@ -16,6 +16,8 @@ router.post('/products', [
   validate,
   createProduct
 ]);
+
+router.delete('/products/:id', authenticateToken, authorizeRoles('super_admin'), deleteProduct);
 
 router.get('/', authenticateToken, authorizeRoles('super_admin', 'branch_admin', 'employee'), getInventory);
 
@@ -32,6 +34,16 @@ router.patch('/stock', [
   body('low_stock_threshold').optional().isInt({ min: 0 }).withMessage('Threshold must be positive'),
   validate,
   updateStock
+]);
+
+router.post('/adjust-stock', [
+  authenticateToken,
+  authorizeRoles('super_admin'),
+  body('product_id').notEmpty(),
+  body('branch_id').notEmpty(),
+  body('quantity').isInt(),
+  validate,
+  adjustStock
 ]);
 
 // Legacy direct restock route removed in favor of approval workflow

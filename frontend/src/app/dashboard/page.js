@@ -299,7 +299,7 @@ export default function Dashboard() {
               <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-[10px] font-black tracking-[4px] uppercase text-main/40 mb-2">
                 {user?.role === 'super_admin' ? 'Global Overview' : 'Branch Operations'}
               </motion.h2>
-              <h1 className="text-h1">
+              <h1 className="text-2xl font-rajdhani font-black uppercase">
                 DASH<span className="text-brand-crimson">BOARD</span>
               </h1>
             </div>

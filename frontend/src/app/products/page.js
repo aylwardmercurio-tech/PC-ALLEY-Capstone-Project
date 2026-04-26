@@ -17,7 +17,8 @@ import {
   Database,
   Hash,
   ChevronRight,
-  Zap
+  Zap,
+  Trash2
 } from "lucide-react";
 import { apiUrl } from "../../lib/api";
 import toast, { Toaster } from "react-hot-toast";
@@ -50,6 +51,28 @@ export default function ProductsPage() {
       console.error("Catalog connection failure:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteProduct = async (product) => {
+    if (!window.confirm(`Are you sure you want to permanently delete "${product.name}"? This will also remove all associated inventory assets.`)) return;
+    
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(apiUrl(`/api/products/${product.id}`), {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        toast.success("Product successfully purged from registry.");
+        fetchProducts();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || err.message || "Failed to purge product.");
+      }
+    } catch (e) {
+      toast.error("Telemetry Error: Deletion sequence failed.");
     }
   };
 
@@ -119,9 +142,9 @@ export default function ProductsPage() {
           <div className="responsive-container">
             
             <div className="mb-6">
-               <h1 className="text-h1">
-                 PRODUCT <span className="text-brand-neonblue">CATALOG</span>
-               </h1>
+                <h1 className="text-2xl font-rajdhani font-black uppercase">
+                  PRODUCT <span className="text-brand-neonblue">CATALOG</span>
+                </h1>
             </div>
           
           {/* Search + Filter */}
@@ -307,9 +330,18 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Price */}
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-[9px] text-main/30 font-black uppercase tracking-[2px] mb-0.5">Price</p>
-                      <p className="text-sm font-rajdhani font-black text-brand-crimson">₱{Number(product.price).toLocaleString()}</p>
+                    <div className="text-right flex-shrink-0 flex items-center gap-6">
+                      <div>
+                        <p className="text-[9px] text-main/30 font-black uppercase tracking-[2px] mb-0.5">Price</p>
+                        <p className="text-sm font-rajdhani font-black text-brand-crimson">₱{Number(product.price).toLocaleString()}</p>
+                      </div>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleDeleteProduct(product); }}
+                        className="w-8 h-8 rounded-lg border border-brand-crimson/10 flex items-center justify-center text-brand-crimson/30 hover:text-brand-crimson hover:bg-brand-crimson/10 transition-all opacity-0 group-hover:opacity-100"
+                        title="Delete Product"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </motion.div>
                 ))}

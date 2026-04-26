@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Sidebar from "../../../components/Sidebar";
 import TopBar from "../../../components/TopBar";
-import { PackageCheck, Search, Filter, Download, Plus, RefreshCw, AlertCircle, TrendingUp, Edit, Clock, ShieldAlert, CheckCircle2, FileDown } from "lucide-react";
+import { PackageCheck, Search, Filter, Download, Plus, RefreshCw, AlertCircle, TrendingUp, Edit, Clock, ShieldAlert, CheckCircle2, FileDown, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiUrl } from "../../../lib/api";
 import { useTheme } from "../../../context/ThemeContext";
@@ -73,6 +73,70 @@ const AddProductModal = ({ isOpen, onClose, onSave }) => {
 };
 
 
+const EditProductModal = ({ product, isOpen, onClose, onUpdate }) => {
+  const [formData, setFormData] = useState({ name: '', sku: '', category_id: '', price: '' });
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    if (isOpen && product) {
+      setFormData({
+        name: product.name,
+        sku: product.sku,
+        category_id: product.category_id || '',
+        price: product.price || product.lastPurchasePrice || ''
+      });
+      
+      const fetchCats = async () => {
+        try {
+          const res = await fetch(apiUrl("/api/categories"), { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+          if(res.ok) setCategories(await res.json());
+        } catch(e) {}
+      };
+      fetchCats();
+    }
+  }, [isOpen, product]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-brand-surface border border-brand-neonblue/30 rounded-2xl p-6 lg:p-8 max-w-lg w-full shadow-2xl relative overflow-hidden">
+        <h2 className="text-2xl font-rajdhani font-black uppercase text-main mb-6">Modify Product Details</h2>
+        
+        <div className="space-y-4 mb-8">
+          <div>
+            <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-1">Product Name</label>
+            <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-brand-bgbase border border-border text-main rounded-lg px-4 py-2 font-bold outline-none focus:border-brand-neonblue" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-1">SKU Code</label>
+              <input type="text" value={formData.sku} onChange={e => setFormData({...formData, sku: e.target.value})} className="w-full bg-brand-bgbase border border-border text-main rounded-lg px-4 py-2 font-bold outline-none focus:border-brand-neonblue" />
+            </div>
+            <div>
+              <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-1">Price</label>
+              <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full bg-brand-bgbase border border-border text-main rounded-lg px-4 py-2 font-bold outline-none focus:border-brand-neonblue" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-[10px] uppercase font-black tracking-widest text-muted mb-1">Hardware Category</label>
+            <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full bg-brand-bgbase border border-border text-main rounded-lg px-4 py-2 font-bold outline-none focus:border-brand-neonblue">
+              <option value="">Select Category...</option>
+              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <button onClick={onClose} className="flex-1 py-3 rounded-lg border border-border text-main font-bold uppercase tracking-widest hover:bg-brand-bgbase transition-colors">Cancel</button>
+          <button onClick={() => onUpdate(formData)} className="flex-1 py-3 rounded-lg bg-brand-neonblue text-white font-black uppercase tracking-[2px] shadow-[0_0_20px_rgba(14,165,233,0.3)] hover:scale-[1.02] transition-transform">Update Registry</button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+
 const HistoryModal = ({ isOpen, onClose, product }) => {
   const [history, setHistory] = useState([]);
   
@@ -129,6 +193,115 @@ const HistoryModal = ({ isOpen, onClose, product }) => {
     </div>
   );
 };
+const DeleteActionModal = ({ product, onClose, onSuccess, user }) => {
+  const [qty, setQty] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const handleAdjust = async () => {
+    if (qty <= 0) return toast.error("Quantity must be greater than 0");
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(apiUrl("/api/inventory/adjust-stock"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          product_id: product.id,
+          branch_id: product.branch_id,
+          quantity: -Math.abs(qty),
+          note: note || "Manual stock reduction"
+        })
+      });
+      if (res.ok) {
+        toast.success(`Removed ${qty} units from inventory.`);
+        onSuccess();
+        onClose();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Adjustment failed.");
+      }
+    } catch (e) {
+      toast.error("Telemetry Error.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePurge = async () => {
+    if (!window.confirm(`ALERT: You are about to PERMANENTLY PURGE "${product.name}" from the entire system registry. This action is irreversible. Continue?`)) return;
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(apiUrl(`/api/inventory/products/${product.id}`), {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success("Product successfully purged from registry.");
+        onSuccess();
+        onClose();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || err.message || "Failed to purge product.");
+      }
+    } catch (e) {
+      toast.error("Telemetry Error.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-brand-surface border border-border/50 rounded-2xl p-8 w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-5 text-brand-crimson pointer-events-none"><Trash2 size={120} /></div>
+        
+        <h2 className="text-xl font-black text-main mb-2 uppercase tracking-tighter flex items-center gap-2">
+          <Trash2 size={20} className="text-brand-crimson" /> 
+          STOCK <span className="text-brand-crimson">REMOVAL</span> & DELETE
+        </h2>
+        <p className="text-[10px] text-muted font-bold uppercase tracking-widest mb-8">Manage inventory for {product.name}</p>
+
+        {/* Action 1: Remove Quantity */}
+        <div className="space-y-4 mb-8">
+          <div className="p-4 rounded-xl bg-brand-bgbase border border-border/30">
+            <label className="block text-[10px] font-black uppercase tracking-widest text-muted mb-3">Subtract from current stock</label>
+            <div className="flex gap-3">
+              <input 
+                type="number" 
+                value={qty} 
+                onChange={e => setQty(e.target.value)} 
+                className="flex-1 bg-brand-surface border border-border/50 rounded-lg px-4 py-2.5 text-main font-bold outline-none focus:border-brand-crimson/50 transition-colors" 
+              />
+              <button 
+                onClick={handleAdjust} 
+                disabled={loading}
+                className="px-6 py-2.5 rounded-lg bg-brand-crimson/10 text-brand-crimson font-black text-[10px] uppercase tracking-widest border border-brand-crimson/20 hover:bg-brand-crimson hover:text-white transition-all"
+              >
+                REMOVE
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Action 2: Delete Product */}
+        <div className="pt-6 border-t border-border/30">
+          <p className="text-[10px] text-red-500 font-black uppercase tracking-[2px] mb-4 text-center underline decoration-red-500/30 underline-offset-4">Delete Product Entry</p>
+          <button 
+            onClick={handlePurge}
+            disabled={loading}
+            className="w-full py-4 rounded-xl bg-red-600 text-white font-black uppercase tracking-[3px] text-xs hover:bg-red-700 transition-all shadow-[0_10px_20px_rgba(220,38,38,0.2)] active:scale-[0.98]"
+          >
+            DELETE FROM SYSTEM
+          </button>
+        </div>
+
+        <button onClick={onClose} className="w-full mt-6 py-2 text-[10px] font-black uppercase tracking-widest text-muted hover:text-main transition-colors">Cancel</button>
+      </motion.div>
+    </div>
+  );
+};
 
 
 export default function StockReportPage() {
@@ -143,6 +316,8 @@ export default function StockReportPage() {
   
   const [activeRestock, setActiveRestock] = useState(null);
   const [activeHistory, setActiveHistory] = useState(null);
+  const [activeDelete, setActiveDelete] = useState(null);
+  const [activeEdit, setActiveEdit] = useState(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
   useEffect(() => {
@@ -191,8 +366,8 @@ export default function StockReportPage() {
         branch_id: item.branch_id,
         name: item.Product?.name || 'Unknown',
         category: item.Product?.Category?.name || 'Uncategorized',
-        supplier: item.Product?.Supplier?.name || 'Unknown',
-        lastPurchasePrice: item.Product?.last_purchase_price,
+        last_purchase_price: item.Product?.last_purchase_price,
+        price: item.Product?.price,
         stock: item.quantity,
         dailySales: daily.toFixed(1),
         daysRemaining: daysRem > 500 ? '∞' : daysRem,
@@ -262,19 +437,45 @@ export default function StockReportPage() {
     }
   };
 
+  const handleUpdateProduct = async (payload) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(apiUrl(`/api/products/${activeEdit.id}`), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        toast.success("Product Registry Updated: Matrix synchronized.");
+        setActiveEdit(null);
+        fetchData();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Update Conflict.");
+      }
+    } catch (e) {
+      toast.error("Telemetry Error: Connection severed.");
+    }
+  };
+
+  const handleDeleteProduct = (product) => {
+    setActiveDelete(product);
+  };
+
   return (
-    <div className={`flex bg-brand-bgbase min-h-screen text-main font-dmsans transition-colors duration-300 ${theme === 'dark' ? 'bg-[#0a0a0a]' : 'bg-[#f0f0eb]'}`}>
+    <div className="flex bg-brand-bgbase min-h-screen text-main font-dmsans transition-all duration-300">
       <Sidebar />
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <Toaster position="top-right" />
         <TopBar title="MANAGE STOCK" />
-        <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10 bg-brand-bgbase text-main">
+        <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10 text-main">
           <div className="responsive-container">
             
             <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
               <div>
                 <h2 className="text-[10px] font-black tracking-[4px] uppercase text-main/40 mb-2">Stock Status</h2>
-                <h1 className="text-h1 mb-0">
+                <h1 className="text-2xl font-rajdhani font-black uppercase mb-0">
                   INVENTORY <span className="text-brand-neonblue">SUMMARY</span>
                 </h1>
               </div>
@@ -365,9 +566,18 @@ export default function StockReportPage() {
                           </span>
                         </td>
                         <td className="py-4 px-6">
-                           <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                             <button className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted hover:text-main hover:bg-border/20 transition-all" title="Edit"><Edit size={14} /></button>
+                           <div className="flex items-center justify-end gap-2 transition-opacity">
+                             <button onClick={() => setActiveEdit(item)} className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted hover:text-main hover:bg-border/20 transition-all" title="Edit"><Edit size={14} /></button>
                              <button onClick={() => setActiveHistory(item)} className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted hover:text-main hover:bg-border/20 transition-all" title="History"><Clock size={14} /></button>
+                             {user?.role === 'super_admin' && (
+                               <button 
+                                 onClick={() => handleDeleteProduct(item)}
+                                 className="w-8 h-8 rounded-lg border border-red-500 bg-red-500/10 flex items-center justify-center text-red-500 hover:text-white hover:bg-red-600 transition-all" 
+                                 title="Delete"
+                               >
+                                 <Trash2 size={14} />
+                               </button>
+                             )}
                              <button onClick={() => setActiveRestock(item)} className="px-4 py-1.5 rounded-lg bg-brand-neonblue/10 text-brand-neonblue font-black text-[10px] uppercase tracking-widest hover:bg-brand-neonblue hover:text-white transition-colors border border-brand-neonblue/20 flex items-center gap-2">
                                Restock <TrendingUp size={12} />
                              </button>
@@ -396,6 +606,22 @@ export default function StockReportPage() {
           />
         )}
         {activeHistory && <HistoryModal isOpen={true} onClose={() => setActiveHistory(null)} product={activeHistory} />}
+        {activeEdit && (
+          <EditProductModal 
+            isOpen={true} 
+            product={activeEdit} 
+            onClose={() => setActiveEdit(null)} 
+            onUpdate={handleUpdateProduct} 
+          />
+        )}
+        {activeDelete && (
+          <DeleteActionModal 
+            product={activeDelete} 
+            onClose={() => setActiveDelete(null)} 
+            onSuccess={fetchData} 
+            user={user}
+          />
+        )}
         {isAddingProduct && <AddProductModal isOpen={true} onClose={() => setIsAddingProduct(false)} onSave={handleSaveProduct} />}
       </AnimatePresence>
     </div>

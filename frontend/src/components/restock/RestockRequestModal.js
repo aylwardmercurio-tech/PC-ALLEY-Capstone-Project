@@ -12,20 +12,15 @@ export default function RestockRequestModal({ inventoryItem, product: legacyProd
   const currentStock = inventoryItem ? (inventoryItem.quantity || 0) : (legacyProduct?.stock || 0);
   
   const [quantity, setQuantity] = useState(1);
-  const [costPrice, setCostPrice] = useState(() => {
-    const unitPrice = product?.last_purchase_price || product?.price || 0;
-    return unitPrice;
-  });
+  const [costPrice, setCostPrice] = useState(0);
   const [supplierId, setSupplierId] = useState('');
   const [targetBranchId, setTargetBranchId] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (product) {
-      const unitPrice = product.last_purchase_price || product.price || 0;
-      setCostPrice(unitPrice * quantity);
-    }
+    const unitPrice = parseFloat(product?.last_purchase_price || product?.price || 0);
+    setCostPrice(unitPrice * parseInt(quantity || 0));
   }, [product, quantity]);
 
   const [suppliers, setSuppliers] = useState([]);
@@ -53,15 +48,13 @@ export default function RestockRequestModal({ inventoryItem, product: legacyProd
     }
 
     try {
-      const [suppliersRes, branchesRes, analyticsRes] = await Promise.all([
-        fetch(apiUrl('/api/suppliers'), { headers: { Authorization: `Bearer ${token}` } }),
+      const [branchesRes, analyticsRes] = await Promise.all([
         fetch(apiUrl('/api/branches'), { headers: { Authorization: `Bearer ${token}` } }),
         branchId ? fetch(apiUrl(`/api/inventory/restock-analytics?product_id=${product.id}&branch_id=${branchId}`), {
           headers: { Authorization: `Bearer ${token}` }
         }) : Promise.resolve({ ok: false })
       ]);
 
-      if (suppliersRes.ok) setSuppliers(await suppliersRes.json());
       if (branchesRes.ok) setBranches(await branchesRes.json());
       if (analyticsRes.ok) {
         const data = await analyticsRes.json();
@@ -189,7 +182,7 @@ export default function RestockRequestModal({ inventoryItem, product: legacyProd
                   required
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
-                  className="w-full bg-brand-surface/10 border border-brand-border/20 rounded-xl pl-12 pr-4 py-4 text-lg font-rajdhani font-bold text-main focus:outline-none focus:border-brand-neonblue/50 transition-all placeholder:text-brand-muted/50"
+                  className="w-full bg-brand-surface/20 border border-brand-border/30 rounded-xl pl-12 pr-4 py-4 text-lg font-rajdhani font-black text-main focus:outline-none focus:border-brand-neonblue/50 transition-all placeholder:text-brand-muted/50"
                   placeholder="0"
                 />
               </div>
@@ -206,18 +199,18 @@ export default function RestockRequestModal({ inventoryItem, product: legacyProd
                   step="0.01"
                   value={costPrice}
                   onChange={(e) => setCostPrice(e.target.value)}
-                  className="w-full bg-brand-surface/10 border border-brand-border/20 rounded-xl pl-12 pr-4 py-4 text-lg font-rajdhani font-bold text-main focus:outline-none focus:border-brand-neonblue/50 transition-all placeholder:text-brand-muted/50"
+                  className="w-full bg-brand-surface/20 border border-brand-border/30 rounded-xl pl-12 pr-4 py-4 text-lg font-rajdhani font-black text-main focus:outline-none focus:border-brand-neonblue/50 transition-all placeholder:text-brand-muted/50"
                   placeholder="0.00"
                 />
               </div>
               <div className="mt-2 ml-4 flex justify-between items-center">
                 <span className="text-[10px] font-black text-brand-muted uppercase tracking-widest">Unit Price:</span>
-                <span className="text-[10px] font-black text-brand-muted font-rajdhani">₱{(product.last_purchase_price || product.price || 0).toLocaleString()} / unit</span>
+                <span className="text-[10px] font-black text-brand-muted font-rajdhani">₱{parseFloat(product.last_purchase_price || product.price || 0).toLocaleString()} / unit</span>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <div>
               <label className="block text-[10px] uppercase tracking-[0.2em] font-rajdhani font-bold text-brand-muted mb-2 ml-1">
                 Target Branch
@@ -226,31 +219,13 @@ export default function RestockRequestModal({ inventoryItem, product: legacyProd
                 disabled={user?.role !== 'super_admin'}
                 value={targetBranchId}
                 onChange={(e) => setTargetBranchId(e.target.value)}
-                className="w-full bg-brand-surface/10 border border-brand-border/20 rounded-xl px-4 py-4 text-sm font-bold text-main focus:outline-none focus:border-brand-neonblue/50 transition-all appearance-none"
+                className="w-full bg-brand-surface/20 border border-brand-border/30 rounded-xl px-4 py-4 text-sm font-bold text-main focus:outline-none focus:border-brand-neonblue/50 transition-all appearance-none"
               >
                 <option value="" className="bg-brand-bgbase text-main">Select Branch...</option>
                 {branches.map(b => (
                   <option key={b.id} value={b.id} className="bg-brand-bgbase text-main">{b.name}</option>
                 ))}
               </select>
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase tracking-[0.2em] font-rajdhani font-bold text-brand-muted mb-2 ml-1">
-                Supplier
-              </label>
-              <div className="relative group">
-                <Truck size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted group-focus-within:text-brand-neonblue transition-colors" />
-                <select
-                  value={supplierId}
-                  onChange={(e) => setSupplierId(e.target.value)}
-                  className="w-full bg-brand-surface/10 border border-brand-border/20 rounded-xl pl-12 pr-4 py-4 text-sm font-bold text-main focus:outline-none focus:border-brand-neonblue/50 transition-all appearance-none"
-                >
-                  <option value="" className="bg-brand-bgbase text-main">Select Supplier...</option>
-                  {suppliers.map(s => (
-                    <option key={s.id} value={s.id} className="bg-brand-bgbase text-main">{s.name}</option>
-                  ))}
-                </select>
-              </div>
             </div>
           </div>
 
